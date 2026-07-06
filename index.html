@@ -100,6 +100,19 @@
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col justify-between">
 
+    <!-- Marquee Disclaimer -->
+    <div class="bg-indigo-950/50 border-b border-indigo-500/20 py-2 overflow-hidden">
+        <marquee behavior="scroll" direction="left" scrollamount="6" class="text-xs font-semibold text-indigo-200">
+            <i class="fa-solid fa-triangle-exclamation mr-2"></i> I'm not SEBI registered, only Analysis Nifty | Bank Nifty | Stocks (Derivative) | 
+            <span class="text-amber-400 font-bold ml-4">📌 Disclaimer (As per SEBI Guideline):</span>
+            <span class="ml-2">▪️ This is not a recommendation to buy or sell.</span>
+            <span class="ml-4">▪️ Our analysis is purely for educational purposes only.</span>
+            <span class="ml-4">▪️ Trading in the financial markets involves risk.</span>
+            <span class="ml-4">▪️ Please consult your SEBI-registered investment advisor before investing.</span>
+        </marquee>
+    </div>
+
+
     <!-- LOGIN PORTAL CONTAINER -->
     <div id="loginPortal" class="flex-grow flex items-center justify-center px-4 py-16 relative z-10">
         <div class="max-w-md w-full space-y-6 glass-card p-8 rounded-3xl shadow-2xl border border-slate-800 relative overflow-hidden">
@@ -838,38 +851,29 @@
         }
 
         function renderTodaysTradeWidget(setup) {
-    const container = document.getElementById('todaysTradeContainer');
-    const badgeElement = document.getElementById('todaysTradeStatusBadge');
-    const bodyElement = document.getElementById('todaysTradeBody');
+            const container = document.getElementById('todaysTradeContainer');
+            const badgeElement = document.getElementById('todaysTradeStatusBadge');
+            const bodyElement = document.getElementById('todaysTradeBody');
 
-    if (!setup) {
-        container.className = "glass-card glowing-border p-6 rounded-3xl relative overflow-hidden shadow-2xl";
-        badgeElement.innerHTML = `<span class="px-3 py-1 text-xs font-bold rounded-full bg-slate-900 text-slate-500">Awaiting Setup</span>`;
-        bodyElement.innerHTML = `<p class="text-slate-500 text-sm">No live setups configured for today yet.</p>${disclaimerHTML}`;
-        return;
-    }
-
-    container.className = "glass-card glowing-gold p-6 rounded-3xl relative overflow-hidden shadow-2xl";
-    badgeElement.innerHTML = `
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-black rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase">
-            <span class="h-2 w-2 rounded-full bg-amber-400 animate-pulse"></span> Live Active
-        </span>
-    `;
-
-    bodyElement.innerHTML = `
-        <div class="grid grid-cols-2 gap-4">
-            <div class="bg-slate-950/60 border border-emerald-500/20 p-4 rounded-2xl text-center">
-                <span class="text-[10px] font-bold text-emerald-400 uppercase block">Buy Price</span>
-                <span class="text-xl font-black text-emerald-400">₹ ${setup.buyPrice}</span>
-            </div>
-            <div class="bg-slate-950/60 border border-amber-500/20 p-4 rounded-2xl text-center">
-                <span class="text-[10px] font-bold text-amber-400 uppercase block">Sale Price</span>
-                <span class="text-xl font-black text-amber-400">₹ ${setup.salePrice}</span>
-            </div>
-        </div>
-        ${disclaimerHTML}
-    `;
-}
+            if (!setup) {
+                // Clean Awaiting State
+                container.className = "glass-card glowing-border p-6 rounded-3xl relative overflow-hidden shadow-2xl transition-all duration-300";
+                badgeElement.innerHTML = `
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-slate-900 text-slate-400 border border-slate-800">
+                        <span class="h-2 w-2 rounded-full bg-slate-500"></span> Awaiting Setup
+                    </span>
+                `;
+                bodyElement.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-6 text-center">
+                        <div class="h-12 w-12 bg-slate-900 border border-slate-800 rounded-full flex items-center justify-center text-slate-500 mb-3 pulse-soft">
+                            <i class="fa-regular fa-hourglass-half text-lg"></i>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Awaiting Active Triggers</h4>
+                        <p class="text-[11px] text-slate-500 max-w-md mt-1 font-medium">No live setups configured for today yet. The setup sheet block will refresh automatically as soon as a new trade trigger is added to your sheet.</p>
+                    </div>
+                `;
+                return;
+            }
 
             // Premium simplified UI (Instrument, Buy Price, and Sale Price ONLY)
             container.className = "glass-card glowing-gold p-6 rounded-3xl relative overflow-hidden shadow-2xl transition-all duration-300";
