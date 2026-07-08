@@ -746,7 +746,7 @@
                 // Update error logs box
                 document.getElementById('technicalErrorMessage').innerHTML = `
                     <strong>Message:</strong> ${error.message || error}<br>
-                    <strong>Troubleshoot:</strong> Agar aapne Google Sheet par public link permission on nahi kiya hai, to browser ise fetch karne se block kar dega.
+                    <strong>Troubleshoot:</strong> If you haven't set the public link permissions on the Database, the browser will block it from being fetched..
                 `;
                 
                 document.getElementById('errorAlert').classList.remove('hidden');
