@@ -287,14 +287,13 @@
                     <div class="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl"></div>
                     <div class="flex justify-between items-start">
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Total Invested Capital</p>
-                        <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-extrabold uppercase tracking-wider">Initial Pool</span>
+                        <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-extrabold uppercase tracking-wider">Total Pool</span>
                     </div>
                     <div class="flex items-baseline gap-2 mt-1">
                         <h2 id="totalInvested" class="text-3xl font-black text-amber-400">&#8377;7,000.00</h2>
                     </div>
                     <p class="text-[11px] text-slate-400 mt-2.5 flex justify-between">
-                        <span>Active Partners: 7</span>
-                        <span>Contribution: &#8377;1,000/each</span>
+                        <span>Sum of all partners</span>
                     </p>
                 </div>
 
@@ -320,14 +319,14 @@
                     <p class="text-xs text-slate-400 mt-2">Sum of Nifty-50 closed trades</p>
                 </div>
 
-                <!-- Share Per Member -->
+                <!-- Mutual Fund Style NAV -->
                 <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden shadow-lg">
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Value Per Member (1 Share)</p>
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Mutual Fund NAV (Per Unit)</p>
                     <div class="flex items-baseline gap-2">
-                        <h2 id="perMemberValue" class="text-3xl font-extrabold text-white">&#8377;1,000.00</h2>
-                        <span id="perMemberProfitBadge" class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">+&#8377;0.00</span>
+                        <h2 id="perMemberValue" class="text-3xl font-extrabold text-white">&#8377;100.00</h2>
+                        <span id="perMemberProfitBadge" class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">+0.00%</span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2">Divided equally among 7 partners</p>
+                    <p class="text-[10px] text-slate-400 mt-2">Base NAV initialized at &#8377;100.00</p>
                 </div>
 
                 <!-- Total Trades -->
@@ -344,14 +343,14 @@
                         <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
                             <i class="fa-solid fa-users text-emerald-400"></i> Partner Shareholding & Live Valuations
                         </h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Calculated based on initial contribution of &#8377;1000 per partner</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Profits are dynamically distributed based on Investment Amount and Date (NAV System)</p>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="shareDashboardDetails()" class="px-3 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/30 rounded-xl text-xs font-semibold text-indigo-300 transition flex items-center gap-1.5">
                             <i class="fa-solid fa-share-nodes"></i> Share Update
                         </button>
                         <div id="memberCountBadge" class="text-xs font-semibold px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-300">
-                            7 Shares Total
+                            7 Active Investors
                         </div>
                     </div>
                 </div>
@@ -471,13 +470,13 @@
         // Demo backup database
         const demoBackupData = {
             members: [
-                { name: "Manoj Sir", investment: 1000 },
-                { name: "Amit Sir", investment: 1000 },
-                { name: "Sandeep Sir", investment: 1000 },
-                { name: "Neeraj Sir", investment: 1000 },
-                { name: "Manisha Mam", investment: 1000 },
-                { name: "Vipul Sir", investment: 1000 },
-                { name: "Gaurav Sir", investment: 1000 }
+                { name: "Manoj Sir", investment: 1000, joinDate: "20-06-2026" },
+                { name: "Amit Sir", investment: 1000, joinDate: "20-06-2026" },
+                { name: "Sandeep Sir", investment: 1000, joinDate: "20-06-2026" },
+                { name: "Neeraj Sir", investment: 1000, joinDate: "20-06-2026" },
+                { name: "Manisha Mam", investment: 1000, joinDate: "20-06-2026" },
+                { name: "Vipul Sir", investment: 1000, joinDate: "20-06-2026" },
+                { name: "Gaurav Sir", investment: 1000, joinDate: "20-06-2026" }
             ],
             trades: [
                 { date: "29-06-2026", buy: 1950.00, sell: 2034.50, pl: 84.50, returnVal: 34.50, remarks: "Trail SL Triggered" },
@@ -485,6 +484,7 @@
             ],
             startingCapital: 7000,
             currentCapital: 10819.50,
+            nav: 154.56,
             todaysTrade: {
                 type: "structured",
                 instrument: "NIFTY 24300 CE (DEMO PREVIEW)",
@@ -641,7 +641,14 @@
                 btnLive.className = "px-3.5 py-1.5 rounded-lg font-bold text-slate-400 hover:text-white transition-all";
                 document.getElementById('errorAlert').classList.add('hidden');
                 
+                // Demo uses the mock NAV calculation
+                const mockMFData = simulateMutualFundNAV(demoBackupData.members, demoBackupData.trades);
+                demoBackupData.nav = mockMFData.finalNAV;
+                demoBackupData.startingCapital = mockMFData.startingCapitalPool;
+                demoBackupData.currentCapital = mockMFData.currentCapital;
+                
                 renderDashboard(demoBackupData);
+                
                 document.getElementById('syncStatus').innerHTML = `
                     <span class="h-2.5 w-2.5 rounded-full bg-indigo-400"></span>
                     Backup Demo View
@@ -773,6 +780,10 @@
                 document.getElementById('errorAlert').classList.remove('hidden');
                 
                 // Fallback to Demo backup dataset
+                const mockMFData = simulateMutualFundNAV(demoBackupData.members, demoBackupData.trades);
+                demoBackupData.nav = mockMFData.finalNAV;
+                demoBackupData.startingCapital = mockMFData.startingCapitalPool;
+                demoBackupData.currentCapital = mockMFData.currentCapital;
                 renderDashboard(demoBackupData);
 
                 document.getElementById('syncStatus').innerHTML = `
@@ -781,6 +792,71 @@
                 `;
                 document.getElementById('syncStatus').className = "px-3.5 py-1.5 text-xs font-semibold rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center gap-2";
             }
+        }
+
+        // MUTUAL FUND NAV CALCULATION ENGINE
+        function simulateMutualFundNAV(members, trades) {
+            const parseDateString = (ds) => {
+                if(!ds || String(ds).trim() === "") return new Date(2000, 0, 1); // Default to start if blank
+                let parts = String(ds).split('-');
+                if(parts.length >= 3) return new Date(parts[2], parts[1]-1, parts[0]);
+                parts = String(ds).split('/');
+                if(parts.length >= 3) return new Date(parts[2], parts[1]-1, parts[0]);
+                return new Date(2000, 0, 1);
+            };
+
+            let events = [];
+            
+            // Push all member investments as chronological events
+            members.forEach(m => {
+                events.push({ type: 'member', dateObj: parseDateString(m.joinDate), data: m });
+            });
+            
+            // Push all trades as chronological events
+            trades.forEach(t => {
+                events.push({ type: 'trade', dateObj: parseDateString(t.date), data: t });
+            });
+
+            // Sort everything by date from oldest to newest
+            events.sort((a, b) => a.dateObj - b.dateObj);
+
+            let currentNAV = 100; // Base Mutual Fund NAV
+            let totalUnits = 0;
+            let currentCapital = 0;
+            let startingCapitalPool = 0;
+
+            // Reset units
+            members.forEach(m => m.units = 0);
+
+            events.forEach(ev => {
+                if (ev.type === 'member') {
+                    // Purchase units at the CURRENT NAV based on their date
+                    let allottedUnits = ev.data.investment / currentNAV;
+                    ev.data.units += allottedUnits;
+                    totalUnits += allottedUnits;
+                    currentCapital += ev.data.investment;
+                    startingCapitalPool += ev.data.investment;
+                } else if (ev.type === 'trade') {
+                    // Apply trade returns to the global pool, then adjust NAV for everyone
+                    currentCapital += ev.data.returnVal;
+                    if (totalUnits > 0) {
+                        currentNAV = currentCapital / totalUnits;
+                    }
+                }
+            });
+
+            // Calculate current exact value for each member based on their units
+            members.forEach(m => {
+                m.currentValue = m.units * currentNAV;
+                m.netProfit = m.currentValue - m.investment;
+            });
+
+            return {
+                finalNAV: currentNAV,
+                totalUnits: totalUnits,
+                currentCapital: currentCapital,
+                startingCapitalPool: startingCapitalPool
+            };
         }
 
         function extractTradeSetupFromRows(rows) {
@@ -985,7 +1061,7 @@
                 }
             }
 
-            // Map Team Members names & investments from Columns B & C
+            // Map Team Members names & investments from Columns B (1), C (2), and Join Date from D (3)
             let parsedMembers = [];
             for (let r = 0; r < rows.length; r++) {
                 const row = rows[r];
@@ -1000,11 +1076,13 @@
                 if (isMemberName) {
                     const cleanInvestVal = String(row[2] || "1000").replace(/[₹\u20B9&#8377;,\s]/g, '');
                     const cellInvestment = parseFloat(cleanInvestVal) || 1000;
+                    const joinDateVal = String(row[3] || "").trim(); // Fetch from Column D
                     
                     if (!parsedMembers.some(m => m.name === cellName)) {
                         parsedMembers.push({
                             name: cellName,
-                            investment: cellInvestment
+                            investment: cellInvestment,
+                            joinDate: joinDateVal
                         });
                     }
                 }
@@ -1014,15 +1092,15 @@
                 parsedMembers = [...demoBackupData.members];
             }
 
-            const startingCapitalPool = parsedMembers.reduce((sum, m) => sum + m.investment, 0);
-            const sumNetReturns = parsedTrades.reduce((sum, t) => sum + t.returnVal, 0);
-            const computedCapital = startingCapitalPool + sumNetReturns;
+            // Execute the Mutual Fund engine
+            const mfCalculations = simulateMutualFundNAV(parsedMembers, parsedTrades);
 
             return {
                 members: parsedMembers,
                 trades: parsedTrades,
-                startingCapital: startingCapitalPool,
-                currentCapital: computedCapital
+                startingCapital: mfCalculations.startingCapitalPool,
+                currentCapital: mfCalculations.currentCapital,
+                nav: mfCalculations.finalNAV
             };
         }
 
@@ -1031,16 +1109,13 @@
             const currentPool = data.currentCapital || 10819.50;
             const netProfit = currentPool - startingPool;
             const profitPercentage = (netProfit / startingPool) * 100;
-
             const memberCount = data.members.length || 7;
-            const valuePerMember = currentPool / memberCount;
-            const profitPerMember = netProfit / memberCount;
 
             // Render Today's Setup Container
             renderTodaysTradeWidget(data.todaysTrade);
 
             // Header counters updates
-            document.getElementById('memberCountBadge').innerText = `${memberCount} Shares Total`;
+            document.getElementById('memberCountBadge').innerText = `${memberCount} Active Investors`;
 
             // DOM UI Values Mapping
             document.getElementById('totalInvested').innerText = `\u20B9${startingPool.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -1057,9 +1132,13 @@
             document.getElementById('totalProfit').innerText = `${netProfit >= 0 ? '+' : ''}\u20B9${netProfit.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('totalProfit').className = `text-3xl font-extrabold ${netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
 
-            document.getElementById('perMemberValue').innerText = `\u20B9${valuePerMember.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('perMemberProfitBadge').innerText = `${profitPerMember >= 0 ? '+' : ''}\u20B9${profitPerMember.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            if (profitPerMember >= 0) {
+            // NAV Values Mapping
+            const currentNAV = data.nav || 100;
+            const navGrowth = ((currentNAV - 100) / 100) * 100;
+            
+            document.getElementById('perMemberValue').innerText = `\u20B9${currentNAV.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('perMemberProfitBadge').innerText = `${navGrowth >= 0 ? '+' : ''}${navGrowth.toFixed(2)}%`;
+            if (navGrowth >= 0) {
                 document.getElementById('perMemberProfitBadge').className = "text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20";
             } else {
                 document.getElementById('perMemberProfitBadge').className = "text-[10px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/20";
@@ -1082,7 +1161,8 @@
                 const chosenAvatar = isFemale ? femaleAvatarSvg : maleAvatarSvg;
 
                 const cardHtml = `
-                    <div class="glass-card p-4 rounded-2xl border ${selectedBorder} text-center flex flex-col justify-between items-center transition-all duration-300 hover:scale-[1.03] hover:border-emerald-500/40 shadow-lg">
+                    <div class="glass-card p-4 rounded-2xl border ${selectedBorder} text-center flex flex-col justify-between items-center transition-all duration-300 hover:scale-[1.03] hover:border-emerald-500/40 shadow-lg relative group overflow-hidden">
+                        
                         <div class="relative mb-3 group">
                             <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-indigo-500 rounded-full blur opacity-15 group-hover:opacity-40 transition duration-300"></div>
                             ${chosenAvatar}
@@ -1090,9 +1170,9 @@
                         <h4 class="text-xs font-bold text-white mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis w-full">${member.name}</h4>
                         <div class="space-y-1 w-full">
                             <p class="text-[9px] text-slate-500 uppercase tracking-widest font-semibold">Initial: \u20B9${member.investment.toLocaleString('en-IN')}</p>
-                            <div class="text-sm font-extrabold text-slate-100">\u20B9${valuePerMember.toLocaleString('en-IN', { maximumFractionDigits: 1 })}</div>
-                            <span class="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-md font-bold inline-block mt-1">
-                                +\u20B9${profitPerMember.toLocaleString('en-IN', { maximumFractionDigits: 1 })}
+                            <div class="text-sm font-extrabold text-slate-100">\u20B9${member.currentValue.toLocaleString('en-IN', { maximumFractionDigits: 1 })}</div>
+                            <span class="text-[9px] ${member.netProfit >= 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'} border px-1.5 py-0.5 rounded-md font-bold inline-block mt-1">
+                                ${member.netProfit >= 0 ? '+' : ''}\u20B9${member.netProfit.toLocaleString('en-IN', { maximumFractionDigits: 1 })}
                             </span>
                         </div>
                     </div>
@@ -1246,12 +1326,12 @@
         function shareDashboardDetails() {
             const totalVal = document.getElementById('totalCapital').innerText;
             const growthVal = document.getElementById('totalGrowthBadge').innerText;
-            const perMemberVal = document.getElementById('perMemberValue').innerText;
+            const navVal = document.getElementById('perMemberValue').innerText;
             const tradesCount = activeData.trades.length;
             
             const textMsg = `*SaiKrupa TradeDesk Live Report* 📈%0A%0A` +
                             `• *Total Current Capital:* ${totalVal} (${growthVal})%0A` +
-                            `• *Value Per Member:* ${perMemberVal}%0A` +
+                            `• *Current NAV (Per Unit):* ${navVal}%0A` +
                             `• *Closed Trades:* ${tradesCount} NIFTY-50 Trades%0A%0A` +
                             `👉 *Live Dashboard Link:* ${window.location.href}`;
                             
