@@ -4,26 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SaiKrupa TradeDesk Live</title>
-    <!-- Tailwind CSS for premium UI styling -->
-    <script src="https://cdn.tailwindcss.com">
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return dateString;
-            return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-        }
-
-</script>
-    <!-- FontAwesome for interactive symbols & graphs -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js for beautiful trend analytics -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js">
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return dateString;
-            return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-        }
-
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -40,14 +23,7 @@
                 }
             }
         }
-    
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return dateString;
-            return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-        }
-
-</script>
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap');
         body {
@@ -121,7 +97,6 @@
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col justify-between">
 
-    <!-- Marquee Disclaimer -->
     <div class="bg-indigo-950/50 border-b border-indigo-500/20 py-2 overflow-hidden">
         <marquee behavior="scroll" direction="left" scrollamount="6" class="text-xs font-semibold text-indigo-200">
             <i class="fa-solid fa-triangle-exclamation mr-2"></i> We are not SEBI registered, Only Analysis Nifty | Bank Nifty | Stocks (Derivative) | 
@@ -134,7 +109,6 @@
     </div>
 
 
-    <!-- LOGIN PORTAL CONTAINER -->
     <div id="loginPortal" class="flex-grow flex items-center justify-center px-4 py-16 relative z-10">
         <div class="max-w-md w-full space-y-6 glass-card p-8 rounded-3xl shadow-2xl border border-slate-800 relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl"></div>
@@ -147,7 +121,6 @@
                 <p class="text-xs text-slate-400 mt-1 font-semibold">Please authenticate to access the Live Dashboard</p>
             </div>
             
-            <!-- Error Banner -->
             <div id="loginError" class="hidden bg-rose-500/10 border border-rose-500/20 text-rose-400 p-3.5 rounded-xl text-xs font-bold text-center">
                 <i class="fa-solid fa-circle-exclamation mr-1.5"></i> Invalid Username or Password. Please try again!
             </div>
@@ -181,7 +154,6 @@
         </div>
     </div>
 
-    <!-- SECURE MASTER WEBSITE AREA (HIDDEN BY DEFAULT) -->
     <div id="dashboardApp" class="hidden flex-col flex-grow">
         <nav class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur sticky top-0 z-50 px-4 py-4 md:px-8">
             <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -196,7 +168,6 @@
                 </div>
                 
                 <div class="flex items-center gap-3 w-full sm:w-auto justify-end flex-wrap">
-                    <!-- Market Status Switch & Auto-Indicator -->
                     <div class="bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-1.5 flex items-center gap-2.5 text-xs">
                         <span id="marketLiveDot" class="h-2.5 w-2.5 rounded-full bg-rose-500 animate-pulse"></span>
                         <span id="marketStatusText" class="font-bold text-slate-300">MARKET CLOSED</span>
@@ -208,7 +179,6 @@
                         </label>
                     </div>
 
-                    <!-- Live Sync Indicator -->
                     <div class="bg-slate-900 border border-slate-800 rounded-xl p-1 flex gap-1 text-xs">
                         <button id="btnModeLive" onclick="switchMode('live')" class="px-3.5 py-1.5 rounded-lg font-bold transition-all bg-emerald-500 text-slate-950 shadow-md">
                             <i class="fa-solid fa-satellite-dish mr-1"></i> Live Sync
@@ -218,13 +188,11 @@
                         </button>
                     </div>
 
-                    <!-- Sync Status Indicator -->
                     <span id="syncStatus" class="px-3.5 py-1.5 text-xs font-semibold rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-2">
                         <span class="h-2.5 w-2.5 rounded-full bg-amber-400 animate-pulse"></span>
                         Connecting...
                     </span>
 
-                    <!-- Logout Button -->
                     <button onclick="logoutSession()" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-rose-500/10 hover:bg-rose-500/25 border border-rose-500/20 text-rose-400 transition-all duration-200 cursor-pointer flex items-center gap-1.5">
                         <i class="fa-solid fa-right-from-bracket"></i> Logout
                     </button>
@@ -232,7 +200,6 @@
             </div>
         </nav>
 
-        <!-- Main Workspace Container -->
         <main class="max-w-7xl mx-auto px-4 md:px-8 mt-6 w-full flex-grow grid grid-cols-1 gap-6">
 
             <div id="errorAlert" class="hidden bg-rose-500/10 border border-rose-500/30 rounded-2xl p-6 text-sm text-rose-300 shadow-xl">
@@ -274,7 +241,6 @@
                 </div>
             </div>
 
-            <!-- TODAY'S TRADE SETUP CONTAINER -->
             <div id="todaysTradeContainer" class="glass-card glowing-gold p-6 rounded-3xl relative overflow-hidden shadow-2xl transition-all duration-300">
                 <div class="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl"></div>
                 
@@ -291,19 +257,14 @@
                         </div>
                     </div>
                     <div id="todaysTradeStatusBadge">
-                        <!-- Loaded dynamically -->
-                    </div>
+                        </div>
                 </div>
 
-                <!-- Setup Content Area (Dynamic Call/Put, Buy, Sale prices ONLY) -->
                 <div id="todaysTradeBody">
-                    <!-- Loaded dynamically or shows awaiting placeholder -->
-                </div>
+                    </div>
             </div>
 
-            <!-- KPI Cards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-                <!-- Highlighted: Total Invested Value -->
                 <div class="glass-card glowing-gold p-6 rounded-2xl relative overflow-hidden shadow-xl border-l-4 border-l-amber-500">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl"></div>
                     <div class="flex justify-between items-start">
@@ -319,7 +280,6 @@
                     </p>
                 </div>
 
-                <!-- Total Fund Capital -->
                 <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden shadow-lg border-l-4 border-l-emerald-500">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl"></div>
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Total Current Fund</p>
@@ -333,7 +293,6 @@
                     </p>
                 </div>
 
-                <!-- Total Net P&L -->
                 <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden shadow-lg border-l-4 border-l-indigo-500">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl"></div>
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Net Profit (Aggregated)</p>
@@ -341,7 +300,6 @@
                     <p class="text-xs text-slate-400 mt-2">Sum of Nifty-50 closed trades</p>
                 </div>
 
-                <!-- Share Per Member -->
                 <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden shadow-lg">
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Value Per Member (1 Share)</p>
                     <div class="flex items-baseline gap-2">
@@ -351,7 +309,6 @@
                     <p class="text-xs text-slate-400 mt-2">Divided equally among 7 partners</p>
                 </div>
 
-                <!-- Total Trades -->
                 <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden">
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Executed Trades</p>
                     <h2 id="tradesCount" class="text-3xl font-extrabold text-indigo-400">0 <span class="text-sm font-medium text-slate-400">Closed</span></h2>
@@ -378,12 +335,10 @@
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4" id="membersGrid">
-                    <!-- Dynamically populated by script (Avatars & calculations) -->
-                </div>
+                    </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Line Chart (Fund Trend) -->
                 <div class="glass-card p-5 rounded-2xl lg:col-span-2">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -396,7 +351,6 @@
                     </div>
                 </div>
 
-                <!-- Bar Chart (Individual returns) -->
                 <div class="glass-card p-5 rounded-2xl">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -409,7 +363,6 @@
                 </div>
             </div>
 
-            <!-- Ledger Database Records -->
             <div class="glass-card rounded-2xl overflow-hidden shadow-2xl">
                 <div class="px-6 py-5 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-900/40">
                     <div>
@@ -436,21 +389,18 @@
                             </tr>
                         </thead>
                         <tbody id="tradesTableBody" class="divide-y divide-slate-800/50 text-sm">
-                            <!-- Loaded dynamically -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Toast Notification Box -->
     <div id="toast" class="fixed bottom-6 right-6 px-5 py-3 bg-slate-900 border border-emerald-500/30 text-emerald-300 rounded-2xl shadow-2xl z-50 hidden transition-all duration-300 flex items-center gap-2 text-xs font-bold">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toastMsg">Action completed successfully!</span>
     </div>
 
-    <!-- Footer copyright info -->
     <footer class="text-center py-6 text-[10px] text-slate-600 font-bold uppercase tracking-wider border-t border-t-slate-900/50 bg-slate-950/30">
         &copy; 2026 SaiKrupa TradeDesk. All rights reserved.
     </footer>
@@ -501,8 +451,8 @@
                 { name: "Gaurav Sir", investment: 1000 }
             ],
             trades: [
-                { date: "29/06/2026", buy: 1950.00, sell: 2034.50, pl: 84.50, returnVal: 34.50, remarks: "Trail SL Triggered" },
-                { date: "30/06/2026", buy: 3380.00, sell: 7215.00, pl: 3835.00, returnVal: 3785.00, remarks: "1st Target Done but move up to max-90" }
+                { date: "29-06-2026", buy: 1950.00, sell: 2034.50, pl: 84.50, returnVal: 34.50, remarks: "Trail SL Triggered" },
+                { date: "30-06-2026", buy: 3380.00, sell: 7215.00, pl: 3835.00, returnVal: 3785.00, remarks: "1st Target Done but move up to max-90" }
             ],
             startingCapital: 7000,
             currentCapital: 10819.50,
@@ -728,20 +678,42 @@
                     throw new Error("Sheet parsed successfully, but table rows are empty.");
                 }
 
-                // Map standard cells into 2D row elements
+                // Map standard cells into 2D row elements (With Direct DD-MM-YYYY Date Fetching)
                 const parsedRows = rawData.table.rows.map(rowObj => {
                     if (!rowObj || !rowObj.c) return [];
                     return rowObj.c.map(cellObj => {
                         if (!cellObj) return "";
+                        
+                        // 1. Google Sheet se sidhe formatted value (jo sheet me dikhta hai) uthayein
+                        if (cellObj.f) {
+                            // Agar sheet me date 29/06/2026 (slash ke sath) hai, to use 29-06-2026 (dash) me convert karein
+                            return String(cellObj.f).replace(/\//g, '-'); 
+                        }
+                        
+                        // 2. Agar API hidden Date format Date(YYYY,M,D) bhejti hai, to usko DD-MM-YYYY me badlein
+                        if (typeof cellObj.v === 'string' && cellObj.v.startsWith('Date(')) {
+                            try {
+                                const parts = cellObj.v.match(/\d+/g);
+                                if (parts && parts.length >= 3) {
+                                    const y = parts[0];
+                                    const m = String(parseInt(parts[1]) + 1).padStart(2, '0'); // Month + 1
+                                    const d = String(parts[2]).padStart(2, '0');
+                                    return `${d}-${m}-${y}`; // DD-MM-YYYY format
+                                }
+                            } catch(e) {}
+                        }
+                        
+                        // Baki sabhi normal numbers ya text ke liye
                         return cellObj.v !== null && cellObj.v !== undefined ? cellObj.v : "";
                     });
                 });
-
-                // Generate parsed dataset
-                const parsedDataset = mapTableRowsToDataset(parsedRows);
                 
                 // ULTRA SAFE INSTRUMENT EXTRACTION: Scan parsed rows to extract setup cells
                 const targetedSetup = extractTradeSetupFromRows(parsedRows);
+                
+                // Generate parsed dataset
+                const parsedDataset = mapTableRowsToDataset(parsedRows);
+                
                 if (targetedSetup) {
                     parsedDataset.todaysTrade = targetedSetup;
                 } else {
@@ -1116,7 +1088,7 @@
                     const isProfit = trade.returnVal >= 0;
                     const rowHtml = `
                         <tr class="border-b border-slate-800/40 hover:bg-slate-900/30 transition-colors duration-150">
-                            <td class="py-4 px-6 font-bold text-slate-200 whitespace-nowrap">${formatDate(trade.date)}</td>
+                            <td class="py-4 px-6 font-bold text-slate-200 whitespace-nowrap">${trade.date}</td>
                             <td class="py-4 px-6">
                                 <span class="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                                     NIFTY-50
@@ -1258,13 +1230,6 @@
             window.open(`https://api.whatsapp.com/send?text=${textMsg}`, '_blank');
             showToast("WhatsApp update generated!");
         }
-    
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return dateString;
-            return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
-        }
-
-</script>
+    </script>
 </body>
 </html>
