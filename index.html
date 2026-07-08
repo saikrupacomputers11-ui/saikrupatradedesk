@@ -5,11 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SaiKrupa TradeDesk Live</title>
     <!-- Tailwind CSS for premium UI styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+        }
+
+</script>
     <!-- FontAwesome for interactive symbols & graphs -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js for beautiful trend analytics -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+        }
+
+</script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -26,7 +40,14 @@
                 }
             }
         }
-    </script>
+    
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+        }
+
+</script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap');
         body {
@@ -1095,7 +1116,7 @@
                     const isProfit = trade.returnVal >= 0;
                     const rowHtml = `
                         <tr class="border-b border-slate-800/40 hover:bg-slate-900/30 transition-colors duration-150">
-                            <td class="py-4 px-6 font-bold text-slate-200 whitespace-nowrap">${trade.date}</td>
+                            <td class="py-4 px-6 font-bold text-slate-200 whitespace-nowrap">${formatDate(trade.date)}</td>
                             <td class="py-4 px-6">
                                 <span class="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                                     NIFTY-50
@@ -1237,6 +1258,13 @@
             window.open(`https://api.whatsapp.com/send?text=${textMsg}`, '_blank');
             showToast("WhatsApp update generated!");
         }
-    </script>
+    
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+        }
+
+</script>
 </body>
 </html>
