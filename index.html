@@ -783,14 +783,13 @@
         // MUTUAL FUND NAV CALCULATION ENGINE
         function simulateMutualFundNAV(members, trades) {
             const parseDateString = (ds) => {
-                // Agar date blank hai toh purane (Day-1) members ke liye 2000 ki default date set karta hai.
                 if(!ds || String(ds).trim() === "") return new Date(2000, 0, 1); 
                 let parts = String(ds).split(/[-/]/);
                 if(parts.length >= 3) {
                     if (parts[0].length === 4) {
-                        return new Date(parts[0], parts[1]-1, parts[2]); // YYYY, MM, DD
+                        return new Date(parts[0], parts[1]-1, parts[2]); 
                     } else {
-                        return new Date(parts[2], parts[1]-1, parts[0]); // DD, MM, YYYY
+                        return new Date(parts[2], parts[1]-1, parts[0]); 
                     }
                 }
                 return new Date(2000, 0, 1);
@@ -1006,7 +1005,8 @@
             }
 
             let parsedTrades = [];
-            for (let r = 0; r < rows.length; r++) {
+            // Safe mapping for transaction log rows (STARTING FROM ROW 13 -> Index 12)
+            for (let r = 12; r < rows.length; r++) {
                 const row = rows[r];
                 if (!row || row.length <= tradeDateColIdx) continue;
                 
@@ -1038,9 +1038,9 @@
                 }
             }
 
-            // SMART MEMBER PARSING (No restrictions on Name!)
+            // SMART MEMBER PARSING (No restrictions on Name!) (STARTING FROM ROW 13 -> Index 12)
             let parsedMembers = [];
-            for (let r = 0; r < rows.length; r++) {
+            for (let r = 12; r < rows.length; r++) {
                 const row = rows[r];
                 if (!row || row.length < 3) continue;
                 
@@ -1050,7 +1050,6 @@
                 const joinDateVal = row.length > 3 ? String(row[3] || "").trim() : ""; 
                 
                 const lowerName = cellName.toLowerCase();
-                // Check if name is not empty, is not a header, and investment is a valid positive number
                 if (cellName && lowerName !== "name" && lowerName !== "partner" && lowerName !== "investor" && !isNaN(cellInvestment) && cellInvestment > 0) {
                     if (!parsedMembers.some(m => m.name === cellName)) {
                         parsedMembers.push({
