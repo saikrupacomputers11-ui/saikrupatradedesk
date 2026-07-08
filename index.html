@@ -290,7 +290,7 @@
                         <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-extrabold uppercase tracking-wider">Total Pool</span>
                     </div>
                     <div class="flex items-baseline gap-2 mt-1">
-                        <h2 id="totalInvested" class="text-3xl font-black text-amber-400">&#8377;7,000.00</h2>
+                        <h2 id="totalInvested" class="text-3xl font-black text-amber-400">&#8377;0.00</h2>
                     </div>
                     <p class="text-[11px] text-slate-400 mt-2.5 flex justify-between">
                         <span>Sum of all partners</span>
@@ -302,7 +302,7 @@
                     <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl"></div>
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Total Current Fund</p>
                     <div class="flex items-baseline gap-2">
-                        <h2 id="totalCapital" class="text-3xl font-extrabold text-white">&#8377;7,000.00</h2>
+                        <h2 id="totalCapital" class="text-3xl font-extrabold text-white">&#8377;0.00</h2>
                         <span id="totalGrowthBadge" class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">+0.00%</span>
                     </div>
                     <p class="text-xs text-slate-400 mt-2 flex justify-between">
@@ -350,7 +350,7 @@
                             <i class="fa-solid fa-share-nodes"></i> Share Update
                         </button>
                         <div id="memberCountBadge" class="text-xs font-semibold px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-300">
-                            7 Active Investors
+                            0 Active Investors
                         </div>
                     </div>
                 </div>
@@ -690,7 +690,7 @@
 
                 const { sheetId, gid } = parseSpreadsheetParams(rawUrl);
                 
-                // Fetch direct visualization JSON (completely bypasses CSV security issues when sheet is shared)
+                // Fetch direct visualization JSON
                 const queryUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
                 
                 const response = await fetch(queryUrl);
@@ -700,7 +700,6 @@
                 
                 const responseText = await response.text();
                 
-                // Parse standard Google JSONP wrapper
                 const jsonStart = responseText.indexOf('{');
                 const jsonEnd = responseText.lastIndexOf('}');
                 if (jsonStart === -1 || jsonEnd === -1) {
@@ -714,39 +713,31 @@
                     throw new Error("Sheet parsed successfully, but table rows are empty.");
                 }
 
-                // Map standard cells into 2D row elements (With ULTRA SAFE Date Fetching)
                 const parsedRows = rawData.table.rows.map(rowObj => {
                     if (!rowObj || !rowObj.c) return [];
                     return rowObj.c.map(cellObj => {
                         if (!cellObj) return "";
                         
-                        // Check if the cell is explicitly a Date format from Google Sheets API
                         if (typeof cellObj.v === 'string' && cellObj.v.startsWith('Date(')) {
-                            // Format sheet wali slash wali date ko dash me badalna
                             if (cellObj.f) {
                                 return String(cellObj.f).replace(/\//g, '-'); 
                             }
-                            // Ya fir manually date convert karna
                             try {
                                 const parts = cellObj.v.match(/\d+/g);
                                 if (parts && parts.length >= 3) {
                                     const y = parts[0];
-                                    const m = String(parseInt(parts[1]) + 1).padStart(2, '0'); // Month + 1
+                                    const m = String(parseInt(parts[1]) + 1).padStart(2, '0'); 
                                     const d = String(parts[2]).padStart(2, '0');
-                                    return `${d}-${m}-${y}`; // DD-MM-YYYY format
+                                    return `${d}-${m}-${y}`; 
                                 }
                             } catch(e) {}
                         }
                         
-                        // NOTE: Sabhi baki numbers, text aur currency cells yahan unchanged rahenge
                         return cellObj.v !== null && cellObj.v !== undefined ? cellObj.v : "";
                     });
                 });
                 
-                // ULTRA SAFE INSTRUMENT EXTRACTION: Scan parsed rows to extract setup cells
                 const targetedSetup = extractTradeSetupFromRows(parsedRows);
-                
-                // Generate parsed dataset
                 const parsedDataset = mapTableRowsToDataset(parsedRows);
                 
                 if (targetedSetup) {
@@ -756,11 +747,8 @@
                 }
 
                 activeData = parsedDataset;
-
-                // Render components
                 renderDashboard(activeData);
 
-                // Set status success
                 document.getElementById('syncStatus').innerHTML = `
                     <span class="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                     Live Sync Active
@@ -771,7 +759,6 @@
             } catch (error) {
                 console.error("Dashboard connection error details: ", error);
                 
-                // Update error logs box
                 document.getElementById('technicalErrorMessage').innerHTML = `
                     <strong>Message:</strong> ${error.message || error}<br>
                     <strong>Troubleshoot:</strong> If you haven't set the public link permissions on the Database, the browser will block it from being fetched..
@@ -779,7 +766,6 @@
                 
                 document.getElementById('errorAlert').classList.remove('hidden');
                 
-                // Fallback to Demo backup dataset
                 const mockMFData = simulateMutualFundNAV(demoBackupData.members, demoBackupData.trades);
                 demoBackupData.nav = mockMFData.finalNAV;
                 demoBackupData.startingCapital = mockMFData.startingCapitalPool;
@@ -797,22 +783,25 @@
         // MUTUAL FUND NAV CALCULATION ENGINE
         function simulateMutualFundNAV(members, trades) {
             const parseDateString = (ds) => {
-                if(!ds || String(ds).trim() === "") return new Date(2000, 0, 1); // Default to start if blank
-                let parts = String(ds).split('-');
-                if(parts.length >= 3) return new Date(parts[2], parts[1]-1, parts[0]);
-                parts = String(ds).split('/');
-                if(parts.length >= 3) return new Date(parts[2], parts[1]-1, parts[0]);
+                // Agar date blank hai toh purane (Day-1) members ke liye 2000 ki default date set karta hai.
+                if(!ds || String(ds).trim() === "") return new Date(2000, 0, 1); 
+                let parts = String(ds).split(/[-/]/);
+                if(parts.length >= 3) {
+                    if (parts[0].length === 4) {
+                        return new Date(parts[0], parts[1]-1, parts[2]); // YYYY, MM, DD
+                    } else {
+                        return new Date(parts[2], parts[1]-1, parts[0]); // DD, MM, YYYY
+                    }
+                }
                 return new Date(2000, 0, 1);
             };
 
             let events = [];
             
-            // Push all member investments as chronological events
             members.forEach(m => {
                 events.push({ type: 'member', dateObj: parseDateString(m.joinDate), data: m });
             });
             
-            // Push all trades as chronological events
             trades.forEach(t => {
                 events.push({ type: 'trade', dateObj: parseDateString(t.date), data: t });
             });
@@ -825,12 +814,11 @@
             let currentCapital = 0;
             let startingCapitalPool = 0;
 
-            // Reset units
             members.forEach(m => m.units = 0);
 
             events.forEach(ev => {
                 if (ev.type === 'member') {
-                    // Purchase units at the CURRENT NAV based on their date
+                    // Purchase units at the CURRENT NAV
                     let allottedUnits = ev.data.investment / currentNAV;
                     ev.data.units += allottedUnits;
                     totalUnits += allottedUnits;
@@ -864,7 +852,6 @@
             let buyPrice = "";
             let salePrice = "";
 
-            // Flatten all cells to a single array of strings for target lookup
             let flatCells = [];
             rows.forEach(row => {
                 if (row) {
@@ -874,7 +861,6 @@
                 }
             });
 
-            // 1. Search for Instrument Name (starts with or contains "Todays Trade_")
             for (let i = 0; i < flatCells.length; i++) {
                 let cellText = flatCells[i];
                 if (cellText.includes("Todays Trade_")) {
@@ -883,7 +869,6 @@
                 }
             }
             
-            // Fallback for instrument search: look for anything containing "Todays Trade"
             if (!instrument) {
                 for (let i = 0; i < flatCells.length; i++) {
                     let cellText = flatCells[i].toLowerCase();
@@ -898,7 +883,6 @@
                 }
             }
 
-            // 2. Search for Buy Price
             for (let i = 0; i < flatCells.length; i++) {
                 let cellText = flatCells[i].toLowerCase();
                 if (cellText.includes("buy :") || cellText.includes("buy:")) {
@@ -915,7 +899,6 @@
                 }
             }
 
-            // 3. Search for Sale Price (Target)
             for (let i = 0; i < flatCells.length; i++) {
                 let cellText = flatCells[i].toLowerCase();
                 if (cellText.includes("sale (target) :") || cellText.includes("sale :") || cellText.includes("sale(target) :") || cellText.includes("sale (target):")) {
@@ -932,7 +915,6 @@
                 }
             }
 
-            // Clean up numbers only
             if (buyPrice) buyPrice = buyPrice.replace(/[^\d.]/g, "");
             if (salePrice) salePrice = salePrice.replace(/[^\d.]/g, "");
 
@@ -953,7 +935,6 @@
             const bodyElement = document.getElementById('todaysTradeBody');
 
             if (!setup) {
-                // Clean Awaiting State
                 container.className = "glass-card glowing-border p-6 rounded-3xl relative overflow-hidden shadow-2xl transition-all duration-300";
                 badgeElement.innerHTML = `
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-slate-900 text-slate-400 border border-slate-800">
@@ -972,7 +953,6 @@
                 return;
             }
 
-            // Premium simplified UI (Instrument, Buy Price, and Sale Price ONLY)
             container.className = "glass-card glowing-gold p-6 rounded-3xl relative overflow-hidden shadow-2xl transition-all duration-300";
 
             badgeElement.innerHTML = `
@@ -1009,7 +989,6 @@
             let netReturnColIdx = 14; // Column O
             let remarksColIdx = 17;   // Column R
 
-            // Auto scan first 15 rows to map dynamic index shifts in columns
             for (let r = 0; r < Math.min(rows.length, 15); r++) {
                 const row = rows[r];
                 if (!row) continue;
@@ -1017,17 +996,16 @@
                 const tDateIdx = rowText.indexOf("trade date");
                 if (tDateIdx !== -1) {
                     tradeDateColIdx = tDateIdx;
-                    buyTotalColIdx = tradeDateColIdx + 6;  // Column L
-                    sellTotalColIdx = tradeDateColIdx + 7; // Column M
-                    grossPlColIdx = tradeDateColIdx + 8;   // Column N
-                    netReturnColIdx = tradeDateColIdx + 9;  // Column O
-                    remarksColIdx = tradeDateColIdx + 12;  // Column R
+                    buyTotalColIdx = tradeDateColIdx + 6;  
+                    sellTotalColIdx = tradeDateColIdx + 7; 
+                    grossPlColIdx = tradeDateColIdx + 8;   
+                    netReturnColIdx = tradeDateColIdx + 9;  
+                    remarksColIdx = tradeDateColIdx + 12;  
                     break;
                 }
             }
 
             let parsedTrades = [];
-            // Safe mapping for transaction log rows
             for (let r = 0; r < rows.length; r++) {
                 const row = rows[r];
                 if (!row || row.length <= tradeDateColIdx) continue;
@@ -1048,7 +1026,6 @@
                 const returnVal = getNumericValue(row[netReturnColIdx]);
                 const remark = String(row[remarksColIdx] || "");
 
-                // Skip the empty formula rows
                 if (buyVal > 0 || sellVal > 0) {
                     parsedTrades.push({
                         date: dateVal,
@@ -1061,23 +1038,20 @@
                 }
             }
 
-            // Map Team Members names & investments from Columns B (1), C (2), and Join Date from D (3)
+            // SMART MEMBER PARSING (No restrictions on Name!)
             let parsedMembers = [];
             for (let r = 0; r < rows.length; r++) {
                 const row = rows[r];
                 if (!row || row.length < 3) continue;
                 
                 const cellName = String(row[1] || "").trim();
-                const isMemberName = cellName.endsWith("Sir") || 
-                                     cellName.endsWith("Mam") || 
-                                     cellName.toLowerCase().includes("sir") || 
-                                     cellName.toLowerCase().includes("mam");
-
-                if (isMemberName) {
-                    const cleanInvestVal = String(row[2] || "1000").replace(/[₹\u20B9&#8377;,\s]/g, '');
-                    const cellInvestment = parseFloat(cleanInvestVal) || 1000;
-                    const joinDateVal = String(row[3] || "").trim(); // Fetch from Column D
-                    
+                const investStr = String(row[2] || "").replace(/[₹\u20B9&#8377;,\sA-Za-z]/g, ''); 
+                const cellInvestment = parseFloat(investStr);
+                const joinDateVal = row.length > 3 ? String(row[3] || "").trim() : ""; 
+                
+                const lowerName = cellName.toLowerCase();
+                // Check if name is not empty, is not a header, and investment is a valid positive number
+                if (cellName && lowerName !== "name" && lowerName !== "partner" && lowerName !== "investor" && !isNaN(cellInvestment) && cellInvestment > 0) {
                     if (!parsedMembers.some(m => m.name === cellName)) {
                         parsedMembers.push({
                             name: cellName,
@@ -1111,13 +1085,10 @@
             const profitPercentage = (netProfit / startingPool) * 100;
             const memberCount = data.members.length || 7;
 
-            // Render Today's Setup Container
             renderTodaysTradeWidget(data.todaysTrade);
 
-            // Header counters updates
             document.getElementById('memberCountBadge').innerText = `${memberCount} Active Investors`;
 
-            // DOM UI Values Mapping
             document.getElementById('totalInvested').innerText = `\u20B9${startingPool.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('totalCapital').innerText = `\u20B9${currentPool.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
@@ -1132,7 +1103,6 @@
             document.getElementById('totalProfit').innerText = `${netProfit >= 0 ? '+' : ''}\u20B9${netProfit.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('totalProfit').className = `text-3xl font-extrabold ${netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
 
-            // NAV Values Mapping
             const currentNAV = data.nav || 100;
             const navGrowth = ((currentNAV - 100) / 100) * 100;
             
@@ -1144,7 +1114,7 @@
                 document.getElementById('perMemberProfitBadge').className = "text-[10px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/20";
             }
 
-            document.getElementById('tradesCount').innerHTML = `${data.trades.length} <span class="text-sm font-medium text-slate-400">Executed</span>`;
+            document.getElementById('tradesCount').innerHTML = `${data.trades.length} <span class="text-sm font-medium text-slate-400">Closed</span>`;
 
             const membersGrid = document.getElementById('membersGrid');
             membersGrid.innerHTML = "";
@@ -1155,9 +1125,8 @@
                 ];
                 const selectedBorder = borderColors[idx % borderColors.length];
                 
-                // Smart gender detection based on keywords in name (Sir / Mam)
                 const cleanNameLower = member.name.toLowerCase().trim();
-                const isFemale = cleanNameLower.includes("mam") || cleanNameLower.includes("manisha");
+                const isFemale = cleanNameLower.includes("mam") || cleanNameLower.includes("manisha") || cleanNameLower.includes("priya");
                 const chosenAvatar = isFemale ? femaleAvatarSvg : maleAvatarSvg;
 
                 const cardHtml = `
@@ -1180,7 +1149,6 @@
                 membersGrid.insertAdjacentHTML('beforeend', cardHtml);
             });
 
-            // Render Ledger table rows
             const tableBody = document.getElementById('tradesTableBody');
             tableBody.innerHTML = "";
             if (data.trades.length === 0) {
@@ -1222,7 +1190,6 @@
                 });
             }
 
-            // Trigger charting sequence
             renderInteractiveCharts(data, startingPool);
         }
 
@@ -1236,7 +1203,6 @@
                 growthPoints.push(runningSum);
             });
 
-            // Line Chart (Cumulative Capital Trend)
             if (growthChartInstance) {
                 growthChartInstance.destroy();
             }
@@ -1281,7 +1247,6 @@
                 }
             });
 
-            // Bar Chart (Per trade Net Returns)
             const barLabels = data.trades.map(t => t.date);
             const barData = data.trades.map(t => t.returnVal);
 
