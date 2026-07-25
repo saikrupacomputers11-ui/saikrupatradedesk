@@ -1,8 +1,3 @@
-Bilkul! "Today's Live Trade Setup" wale box mein bhi bilkul waisa hi **"Share Update"** button jod diya gaya hai, jisse aap direct wahan se bhi trade setup ko WhatsApp par share kar sakein.
-
-Neeche updated code hai:
-
-```html
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -274,8 +269,9 @@ Neeche updated code hai:
                             <p class="text-[11px] text-slate-400 font-medium">Simplified Call/Put targets populated directly from DataBase</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="shareDashboardDetails()" class="px-3 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/30 rounded-xl text-xs font-semibold text-indigo-300 transition flex items-center gap-1.5 cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <!-- Share Update Button placed right where requested -->
+                        <button onclick="shareDashboardDetails()" class="px-3.5 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/30 rounded-xl text-xs font-semibold text-indigo-300 transition flex items-center gap-1.5 cursor-pointer shadow-md">
                             <i class="fa-solid fa-share-nodes"></i> Share Update
                         </button>
                         <div id="todaysTradeStatusBadge">
@@ -357,7 +353,7 @@ Neeche updated code hai:
                         <p class="text-xs text-slate-400 mt-0.5">Calculated based on initial contribution of &#8377;1000 per partner</p>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="shareDashboardDetails()" class="px-3 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/30 rounded-xl text-xs font-semibold text-indigo-300 transition flex items-center gap-1.5 cursor-pointer">
+                        <button onclick="shareDashboardDetails()" class="px-3.5 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/30 rounded-xl text-xs font-semibold text-indigo-300 transition flex items-center gap-1.5 cursor-pointer shadow-md">
                             <i class="fa-solid fa-share-nodes"></i> Share Update
                         </button>
                         <div id="memberCountBadge" class="text-xs font-semibold px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-300">
@@ -448,7 +444,6 @@ Neeche updated code hai:
         // Default Google Sheet Link shared by User
         const defaultSheetUrl = "https://docs.google.com/spreadsheets/d/1OiAddKrNDZeIc1_A_Xd9tDygugaD-oaWByPAjT4ntcc/edit?gid=43965844#gid=43965844";
 
-        // Modern flat vectors matching image_7d1d9d.png style as responsive self-contained inline SVG structures
         const maleAvatarSvg = `
             <svg viewBox="0 0 100 100" class="relative h-12 w-12 rounded-full border-2 border-slate-700/80 shadow-md">
                 <circle cx="50" cy="50" r="48" fill="#e2ebf0" />
@@ -478,7 +473,6 @@ Neeche updated code hai:
             </svg>
         `;
 
-        // Demo backup database
         const demoBackupData = {
             members: [
                 { name: "Manoj Sir", investment: 1000 },
@@ -510,7 +504,6 @@ Neeche updated code hai:
         let marketInterval = null;
         let manualMarketOverride = false;
 
-        // Initialize Authentication & Session States
         window.addEventListener('DOMContentLoaded', () => {
             checkExistingSession();
         });
@@ -518,80 +511,61 @@ Neeche updated code hai:
         function checkExistingSession() {
             const isAuth = localStorage.getItem('saikrupa_logged_in') === 'true';
             if (isAuth) {
-                // If already logged in, show dashboard directly
                 document.getElementById('loginPortal').classList.add('hidden');
                 document.getElementById('dashboardApp').classList.remove('hidden');
-                
-                // Fetch data & start widgets
                 fetchDataFromSheet(defaultSheetUrl);
                 initMarketStatusTimer();
             } else {
-                // Keep on login page
                 document.getElementById('loginPortal').classList.remove('hidden');
                 document.getElementById('dashboardApp').classList.add('hidden');
             }
         }
 
-        // Handle Secure Login Submission
         function handleLoginSubmit(event) {
             event.preventDefault();
             const usernameInput = document.getElementById('loginUser').value.trim();
             const passwordInput = document.getElementById('loginPass').value.trim();
 
-            // Username (case insensitive checking), Password (case sensitive)
             if (usernameInput.toLowerCase() === 'saikrupa' && passwordInput === 'Saikrupa@123') {
                 localStorage.setItem('saikrupa_logged_in', 'true');
                 document.getElementById('loginError').classList.add('hidden');
-                
-                // Visual transition
                 document.getElementById('loginPortal').classList.add('hidden');
                 document.getElementById('dashboardApp').classList.remove('hidden');
-                
-                // Initialize features
                 fetchDataFromSheet(defaultSheetUrl);
                 initMarketStatusTimer();
                 showToast("Welcome to SaiKrupa TradeDesk!");
             } else {
-                // Show login error state
                 document.getElementById('loginError').classList.remove('hidden');
             }
         }
 
-        // Logout action
         function logoutSession() {
             localStorage.removeItem('saikrupa_logged_in');
-            // Transition back to login view
             document.getElementById('dashboardApp').classList.add('hidden');
             document.getElementById('loginPortal').classList.remove('hidden');
-            
-            // Clean inputs
             document.getElementById('loginUser').value = '';
             document.getElementById('loginPass').value = '';
-            
             if (marketInterval) clearInterval(marketInterval);
             showToast("Logged out successfully");
         }
 
         function initMarketStatusTimer() {
             checkAndSetMarketStatus();
-            // Refresh market status every 15 seconds
             marketInterval = setInterval(checkAndSetMarketStatus, 15000);
         }
 
         function checkAndSetMarketStatus() {
             if (manualMarketOverride) return;
 
-            // Get current time in India (IST)
             const options = { timeZone: 'Asia/Kolkata', hour12: false };
             const indianTimeStr = new Date().toLocaleString('en-US', options);
             const indiaDate = new Date(indianTimeStr);
 
-            const day = indiaDate.getDay(); // 0 = Sun, 6 = Sat
+            const day = indiaDate.getDay();
             const hours = indiaDate.getHours();
             const minutes = indiaDate.getMinutes();
             const currentTimeDec = hours + (minutes / 60);
 
-            // Indian Stock Market (NSE/BSE) hours: Mon-Fri, 9:15 AM (9.25) to 3:30 PM (15.5)
             const isWeekday = day >= 1 && day <= 5;
             const isMarketHours = currentTimeDec >= 9.25 && currentTimeDec <= 15.5;
 
@@ -603,11 +577,9 @@ Neeche updated code hai:
             manualMarketOverride = toggleCheckbox.checked;
             
             if (manualMarketOverride) {
-                // If override activated, set to "OPEN"
                 updateMarketUI(true);
                 showToast("Market Status manual override: OPEN");
             } else {
-                // Fallback to real clock calculation
                 checkAndSetMarketStatus();
                 showToast("Automatic Live Market Status active");
             }
@@ -664,14 +636,13 @@ Neeche updated code hai:
             }
         }
 
-        // Extract clean Spreadsheet ID and gid values
         function parseSpreadsheetParams(url) {
             const sheetIdMatches = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
             if (!sheetIdMatches || !sheetIdMatches[1]) {
                 throw new Error("Invalid Google Sheet URL format.");
             }
             const sheetId = sheetIdMatches[1];
-            let gid = '43965844'; // default gid for Only NIFTY-50
+            let gid = '43965844';
             const gidMatches = url.match(/gid=([0-9]+)/);
             if (gidMatches && gidMatches[1]) {
                 gid = gidMatches[1];
@@ -683,7 +654,6 @@ Neeche updated code hai:
             if (activeMode === 'demo') return;
             
             try {
-                // Connecting UI status
                 document.getElementById('syncStatus').innerHTML = `
                     <span class="h-2.5 w-2.5 rounded-full bg-indigo-400 animate-pulse"></span>
                     Syncing live...
@@ -692,8 +662,6 @@ Neeche updated code hai:
                 document.getElementById('errorAlert').classList.add('hidden');
 
                 const { sheetId, gid } = parseSpreadsheetParams(rawUrl);
-                
-                // Fetch direct visualization JSON (completely bypasses CSV security issues when sheet is shared)
                 const queryUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
                 
                 const response = await fetch(queryUrl);
@@ -702,8 +670,6 @@ Neeche updated code hai:
                 }
                 
                 const responseText = await response.text();
-                
-                // Parse standard Google JSONP wrapper
                 const jsonStart = responseText.indexOf('{');
                 const jsonEnd = responseText.lastIndexOf('}');
                 if (jsonStart === -1 || jsonEnd === -1) {
@@ -717,39 +683,29 @@ Neeche updated code hai:
                     throw new Error("Sheet parsed successfully, but table rows are empty.");
                 }
 
-                // Map standard cells into 2D row elements (With ULTRA SAFE Date Fetching)
                 const parsedRows = rawData.table.rows.map(rowObj => {
                     if (!rowObj || !rowObj.c) return [];
                     return rowObj.c.map(cellObj => {
                         if (!cellObj) return "";
-                        
-                        // Check if the cell is explicitly a Date format from Google Sheets API
                         if (typeof cellObj.v === 'string' && cellObj.v.startsWith('Date(')) {
-                            // Format sheet wali slash wali date ko dash me badalna
                             if (cellObj.f) {
                                 return String(cellObj.f).replace(/\//g, '-'); 
                             }
-                            // Ya fir manually date convert karna
                             try {
                                 const parts = cellObj.v.match(/\d+/g);
                                 if (parts && parts.length >= 3) {
                                     const y = parts[0];
-                                    const m = String(parseInt(parts[1]) + 1).padStart(2, '0'); // Month + 1
+                                    const m = String(parseInt(parts[1]) + 1).padStart(2, '0');
                                     const d = String(parts[2]).padStart(2, '0');
-                                    return `${d}-${m}-${y}`; // DD-MM-YYYY format
+                                    return `${d}-${m}-${y}`;
                                 }
                             } catch(e) {}
                         }
-                        
-                        // NOTE: Sabhi baki numbers, text aur currency cells yahan unchanged rahenge
                         return cellObj.v !== null && cellObj.v !== undefined ? cellObj.v : "";
                     });
                 });
                 
-                // ULTRA SAFE INSTRUMENT EXTRACTION: Scan parsed rows to extract setup cells
                 const targetedSetup = extractTradeSetupFromRows(parsedRows);
-                
-                // Generate parsed dataset
                 const parsedDataset = mapTableRowsToDataset(parsedRows);
                 
                 if (targetedSetup) {
@@ -759,11 +715,8 @@ Neeche updated code hai:
                 }
 
                 activeData = parsedDataset;
-
-                // Render components
                 renderDashboard(activeData);
 
-                // Set status success
                 document.getElementById('syncStatus').innerHTML = `
                     <span class="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                     Live Sync Active
@@ -773,16 +726,11 @@ Neeche updated code hai:
 
             } catch (error) {
                 console.error("Dashboard connection error details: ", error);
-                
-                // Update error logs box
                 document.getElementById('technicalErrorMessage').innerHTML = `
                     <strong>Message:</strong> ${error.message || error}<br>
                     <strong>Troubleshoot:</strong> If you haven't set the public link permissions on the Database, the browser will block it from being fetched..
                 `;
-                
                 document.getElementById('errorAlert').classList.remove('hidden');
-                
-                // Fallback to Demo backup dataset
                 renderDashboard(demoBackupData);
 
                 document.getElementById('syncStatus').innerHTML = `
@@ -798,7 +746,6 @@ Neeche updated code hai:
             let buyPrice = "";
             let salePrice = "";
 
-            // Flatten all cells to a single array of strings for target lookup
             let flatCells = [];
             rows.forEach(row => {
                 if (row) {
@@ -808,7 +755,6 @@ Neeche updated code hai:
                 }
             });
 
-            // 1. Search for Instrument Name (starts with or contains "Todays Trade_")
             for (let i = 0; i < flatCells.length; i++) {
                 let cellText = flatCells[i];
                 if (cellText.includes("Todays Trade_")) {
@@ -817,7 +763,6 @@ Neeche updated code hai:
                 }
             }
             
-            // Fallback for instrument search: look for anything containing "Todays Trade"
             if (!instrument) {
                 for (let i = 0; i < flatCells.length; i++) {
                     let cellText = flatCells[i].toLowerCase();
@@ -832,7 +777,6 @@ Neeche updated code hai:
                 }
             }
 
-            // 2. Search for Buy Price
             for (let i = 0; i < flatCells.length; i++) {
                 let cellText = flatCells[i].toLowerCase();
                 if (cellText.includes("buy :") || cellText.includes("buy:")) {
@@ -849,7 +793,6 @@ Neeche updated code hai:
                 }
             }
 
-            // 3. Search for Sale Price (Target)
             for (let i = 0; i < flatCells.length; i++) {
                 let cellText = flatCells[i].toLowerCase();
                 if (cellText.includes("sale (target) :") || cellText.includes("sale :") || cellText.includes("sale(target) :") || cellText.includes("sale (target):")) {
@@ -866,7 +809,6 @@ Neeche updated code hai:
                 }
             }
 
-            // Clean up numbers only
             if (buyPrice) buyPrice = buyPrice.replace(/[^\d.]/g, "");
             if (salePrice) salePrice = salePrice.replace(/[^\d.]/g, "");
 
@@ -887,7 +829,6 @@ Neeche updated code hai:
             const bodyElement = document.getElementById('todaysTradeBody');
 
             if (!setup) {
-                // Clean Awaiting State
                 container.className = "glass-card glowing-border p-6 rounded-3xl relative overflow-hidden shadow-2xl transition-all duration-300";
                 badgeElement.innerHTML = `
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-slate-900 text-slate-400 border border-slate-800">
@@ -906,7 +847,6 @@ Neeche updated code hai:
                 return;
             }
 
-            // Premium simplified UI (Instrument, Buy Price, and Sale Price ONLY)
             container.className = "glass-card glowing-gold p-6 rounded-3xl relative overflow-hidden shadow-2xl transition-all duration-300";
 
             badgeElement.innerHTML = `
@@ -936,14 +876,13 @@ Neeche updated code hai:
         }
 
         function mapTableRowsToDataset(rows) {
-            let tradeDateColIdx = 5;  // Column F
-            let buyTotalColIdx = 11;  // Column L
-            let sellTotalColIdx = 12; // Column M
-            let grossPlColIdx = 13;   // Column N
-            let netReturnColIdx = 14; // Column O
-            let remarksColIdx = 17;   // Column R
+            let tradeDateColIdx = 5;
+            let buyTotalColIdx = 11;
+            let sellTotalColIdx = 12;
+            let grossPlColIdx = 13;
+            let netReturnColIdx = 14;
+            let remarksColIdx = 17;
 
-            // Auto scan first 15 rows to map dynamic index shifts in columns
             for (let r = 0; r < Math.min(rows.length, 15); r++) {
                 const row = rows[r];
                 if (!row) continue;
@@ -951,17 +890,16 @@ Neeche updated code hai:
                 const tDateIdx = rowText.indexOf("trade date");
                 if (tDateIdx !== -1) {
                     tradeDateColIdx = tDateIdx;
-                    buyTotalColIdx = tradeDateColIdx + 6;  // Column L
-                    sellTotalColIdx = tradeDateColIdx + 7; // Column M
-                    grossPlColIdx = tradeDateColIdx + 8;   // Column N
-                    netReturnColIdx = tradeDateColIdx + 9;  // Column O
-                    remarksColIdx = tradeDateColIdx + 12;  // Column R
+                    buyTotalColIdx = tradeDateColIdx + 6;
+                    sellTotalColIdx = tradeDateColIdx + 7;
+                    grossPlColIdx = tradeDateColIdx + 8;
+                    netReturnColIdx = tradeDateColIdx + 9;
+                    remarksColIdx = tradeDateColIdx + 12;
                     break;
                 }
             }
 
             let parsedTrades = [];
-            // Safe mapping for transaction log rows
             for (let r = 0; r < rows.length; r++) {
                 const row = rows[r];
                 if (!row || row.length <= tradeDateColIdx) continue;
@@ -982,7 +920,6 @@ Neeche updated code hai:
                 const returnVal = getNumericValue(row[netReturnColIdx]);
                 const remark = String(row[remarksColIdx] || "");
 
-                // Skip the empty formula rows
                 if (buyVal > 0 || sellVal > 0) {
                     parsedTrades.push({
                         date: dateVal,
@@ -995,7 +932,6 @@ Neeche updated code hai:
                 }
             }
 
-            // Map Team Members names & investments from Columns B & C
             let parsedMembers = [];
             for (let r = 0; r < rows.length; r++) {
                 const row = rows[r];
@@ -1046,13 +982,10 @@ Neeche updated code hai:
             const valuePerMember = currentPool / memberCount;
             const profitPerMember = netProfit / memberCount;
 
-            // Render Today's Setup Container
             renderTodaysTradeWidget(data.todaysTrade);
 
-            // Header counters updates
             document.getElementById('memberCountBadge').innerText = `${memberCount} Shares Total`;
 
-            // DOM UI Values Mapping
             document.getElementById('totalInvested').innerText = `\u20B9${startingPool.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('totalCapital').innerText = `\u20B9${currentPool.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
@@ -1086,7 +1019,6 @@ Neeche updated code hai:
                 ];
                 const selectedBorder = borderColors[idx % borderColors.length];
                 
-                // Smart gender detection based on keywords in name (Sir / Mam)
                 const cleanNameLower = member.name.toLowerCase().trim();
                 const isFemale = cleanNameLower.includes("mam") || cleanNameLower.includes("manisha");
                 const chosenAvatar = isFemale ? femaleAvatarSvg : maleAvatarSvg;
@@ -1110,7 +1042,6 @@ Neeche updated code hai:
                 membersGrid.insertAdjacentHTML('beforeend', cardHtml);
             });
 
-            // Render Ledger table rows
             const tableBody = document.getElementById('tradesTableBody');
             tableBody.innerHTML = "";
             if (data.trades.length === 0) {
@@ -1125,7 +1056,7 @@ Neeche updated code hai:
                 data.trades.forEach(trade => {
                     const isProfit = trade.returnVal >= 0;
                     const rowHtml = `
-                        <tr class="border-b border-slate-800/40 hover:bg-slate-900/30 transition-colors duration-150">
+                        <tr class="border-b border-slate-800/40 hover:bg-slate-900/35 transition-colors duration-150">
                             <td class="py-4 px-6 font-bold text-slate-200 whitespace-nowrap">${trade.date}</td>
                             <td class="py-4 px-6">
                                 <span class="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
@@ -1152,7 +1083,6 @@ Neeche updated code hai:
                 });
             }
 
-            // Trigger charting sequence
             renderInteractiveCharts(data, startingPool);
         }
 
@@ -1166,7 +1096,6 @@ Neeche updated code hai:
                 growthPoints.push(runningSum);
             });
 
-            // Line Chart (Cumulative Capital Trend)
             if (growthChartInstance) {
                 growthChartInstance.destroy();
             }
@@ -1211,7 +1140,6 @@ Neeche updated code hai:
                 }
             });
 
-            // Bar Chart (Per trade Net Returns)
             const barLabels = data.trades.map(t => t.date);
             const barData = data.trades.map(t => t.returnVal);
 
@@ -1252,7 +1180,6 @@ Neeche updated code hai:
             });
         }
 
-        // WhatsApp Share Link Generator
         function shareDashboardDetails() {
             const setup = activeData.todaysTrade;
             const totalVal = document.getElementById('totalCapital').innerText;
@@ -1279,5 +1206,3 @@ Neeche updated code hai:
     </script>
 </body>
 </html>
-
-```
