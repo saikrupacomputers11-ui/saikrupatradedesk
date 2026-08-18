@@ -859,20 +859,74 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                     <div class="space-y-1">
                         <span class="text-[10px] font-black uppercase text-amber-400 tracking-widest block">Active Call/Put</span>
-                        <h4 class="text-2xl font-black text-white tracking-tight">${setup.instrument}</h4>
+                        <h4 class="text-2xl font-black text-white tracking-tight">${escapeHtml(setup.instrument)}</h4>
                     </div>
                     <div class="md:col-span-2 grid grid-cols-2 gap-4">
                         <div class="bg-slate-950/60 border border-emerald-500/20 p-4 rounded-2xl text-center">
                             <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">Buy Price</span>
-                            <span class="text-2xl font-black text-emerald-400 mt-1 block">&#8377; ${setup.buyPrice}</span>
+                            <span class="text-2xl font-black text-emerald-400 mt-1 block">&#8377; ${escapeHtml(setup.buyPrice)}</span>
                         </div>
                         <div class="bg-slate-950/60 border border-amber-500/20 p-4 rounded-2xl text-center">
                             <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest block">Sale Price</span>
-                            <span class="text-2xl font-black text-amber-400 mt-1 block">&#8377; ${setup.salePrice}</span>
+                            <span class="text-2xl font-black text-amber-400 mt-1 block">&#8377; ${escapeHtml(setup.salePrice)}</span>
                         </div>
                     </div>
                 </div>
+
+                <!-- BUY Button + Broker List -->
+                <div class="mt-5 pt-5 border-t border-slate-800/70">
+                    <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                        <button type="button"
+                            onclick="openTradeBroker()"
+                            class="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/10 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-cart-shopping"></i> BUY ${escapeHtml(setup.instrument)}
+                        </button>
+
+                        <div class="flex-1">
+                            <label for="tradeBrokerSelect" class="sr-only">Select Broker</label>
+                            <select id="tradeBrokerSelect"
+                                class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-xs font-bold text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer">
+                                <option value="zerodha">Zerodha Kite</option>
+                                <option value="upstox">Upstox</option>
+                                <option value="angelone">Angel One</option>
+                                <option value="icici">ICICI Direct</option>
+                                <option value="groww">Groww</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-slate-500 mt-2.5">
+                        <i class="fa-solid fa-circle-info mr-1"></i>
+                        BUY button selected broker ka trading platform kholega. Order place karne se pehle broker login aur final order confirmation required hai.
+                    </p>
+                </div>
             `;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function openTradeBroker() {
+            const broker = document.getElementById('tradeBrokerSelect')?.value || 'zerodha';
+            const instrument = activeData?.todaysTrade?.instrument || '';
+
+            const brokerUrls = {
+                zerodha: 'https://kite.zerodha.com/',
+                upstox: 'https://pro.upstox.com/',
+                angelone: 'https://trade.angelone.in/',
+                icici: 'https://secure.icicidirect.com/',
+                groww: 'https://groww.in/'
+            };
+
+            localStorage.setItem('saikrupa_preferred_broker', broker);
+            localStorage.setItem('saikrupa_trade_instrument', instrument);
+
+            window.open(brokerUrls[broker] || brokerUrls.zerodha, '_blank', 'noopener,noreferrer');
         }
 
         function mapTableRowsToDataset(rows) {
