@@ -112,7 +112,6 @@
         </marquee>
     </div>
 
-
     <!-- LOGIN PORTAL CONTAINER -->
     <div id="loginPortal" class="flex-grow flex items-center justify-center px-4 py-16 relative z-10">
         <div class="max-w-md w-full space-y-6 glass-card p-8 rounded-3xl shadow-2xl border border-slate-800 relative overflow-hidden">
@@ -270,7 +269,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <!-- Share Update Button placed right where requested -->
+                        <!-- Share Update Button -->
                         <button onclick="shareDashboardDetails()" class="px-3.5 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/30 rounded-xl text-xs font-semibold text-indigo-300 transition flex items-center gap-1.5 cursor-pointer shadow-md">
                             <i class="fa-solid fa-share-nodes"></i> Share Update
                         </button>
@@ -363,7 +362,7 @@
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4" id="membersGrid">
-                    <!-- Dynamically populated by script (Avatars & calculations) -->
+                    <!-- Dynamically populated by script -->
                 </div>
             </div>
 
@@ -403,7 +402,7 @@
                         </h3>
                         <p class="text-xs text-slate-400 mt-0.5">Filter automatically bypasses empty formulic rows</p>
                     </div>
-                    <span class="text-xs text-slate-400 italic bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">Sort: Date Descending</span>
+                    <span class="text-xs text-slate-400 italic bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">Grouped: Monthly Breakdown</span>
                 </div>
                 
                 <div class="overflow-x-auto">
@@ -896,7 +895,7 @@
                     </div>
                     <p class="text-[10px] text-slate-500 mt-2.5">
                         <i class="fa-solid fa-circle-info mr-1"></i>
-                        Click the BUY button to open the selected broker’s trading platform. Broker login and final order confirmation are required before placing the order.
+                        BUY button selected broker ka trading platform kholega. Order place karne se pehle broker login aur final order confirmation required hai.
                     </p>
                 </div>
             `;
@@ -1096,8 +1095,10 @@
                 membersGrid.insertAdjacentHTML('beforeend', cardHtml);
             });
 
+            // --- MONTH-WISE GROUPING LOGIC FOR TRADE HISTORY LOG ---
             const tableBody = document.getElementById('tradesTableBody');
             tableBody.innerHTML = "";
+
             if (data.trades.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
@@ -1107,33 +1108,81 @@
                     </tr>
                 `;
             } else {
+                // Helper to get Month Year from date string (DD-MM-YYYY)
+                const getMonthYear = (dateStr) => {
+                    const parts = dateStr.split('-');
+                    if (parts.length === 3) {
+                        const monthIndex = parseInt(parts[1], 10) - 1;
+                        const dateObj = new Date(parts[2], monthIndex, parts[0]);
+                        if (!isNaN(dateObj.getTime())) {
+                            return dateObj.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+                        }
+                    }
+                    return "Other Trades";
+                };
+
+                // Group trades by Month-Year
+                const groupedTrades = {};
                 data.trades.forEach(trade => {
-                    const isProfit = trade.returnVal >= 0;
-                    const rowHtml = `
-                        <tr class="border-b border-slate-800/40 hover:bg-slate-900/35 transition-colors duration-150">
-                            <td class="py-4 px-6 font-bold text-slate-200 whitespace-nowrap">${trade.date}</td>
-                            <td class="py-4 px-6">
-                                <span class="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                                    NIFTY-50
-                                </span>
+                    const monthKey = getMonthYear(trade.date);
+                    if (!groupedTrades[monthKey]) {
+                        groupedTrades[monthKey] = [];
+                    }
+                    groupedTrades[monthKey].push(trade);
+                });
+
+                // Render trades with Month Header Dividers
+                Object.keys(groupedTrades).forEach(monthName => {
+                    const monthTrades = groupedTrades[monthName];
+                    const monthNetProfit = monthTrades.reduce((sum, t) => sum + t.returnVal, 0);
+                    const isMonthProfit = monthNetProfit >= 0;
+
+                    // Add Month Header Row
+                    const headerHtml = `
+                        <tr class="bg-slate-900/90 border-y border-slate-800">
+                            <td colspan="8" class="py-3 px-6 font-black text-xs text-indigo-300 uppercase tracking-wider">
+                                <div class="flex justify-between items-center">
+                                    <span class="flex items-center gap-2">
+                                        <i class="fa-regular fa-calendar-days text-indigo-400"></i> ${monthName} (${monthTrades.length} Trades)
+                                    </span>
+                                    <span class="text-[11px] font-bold ${isMonthProfit ? 'text-emerald-400' : 'text-rose-400'}">
+                                        Month Net Return: ${isMonthProfit ? '+' : ''}\u20B9${monthNetProfit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                    </span>
+                                </div>
                             </td>
-                            <td class="py-4 px-6 font-semibold text-slate-300">\u20B9${trade.buy.toLocaleString('en-IN', { minimumFractionDigits: 1 })}</td>
-                            <td class="py-4 px-6 font-semibold text-slate-300">\u20B9${trade.sell.toLocaleString('en-IN', { minimumFractionDigits: 1 })}</td>
-                            <td class="py-4 px-6 font-semibold ${trade.pl >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
-                                ${trade.pl >= 0 ? '+' : ''}\u20B9${trade.pl.toLocaleString('en-IN', { minimumFractionDigits: 1 })}
-                            </td>
-                            <td class="py-4 px-6 font-extrabold ${isProfit ? 'text-emerald-400 bg-emerald-500/5' : 'text-rose-400 bg-rose-500/5'} rounded-lg">
-                                ${isProfit ? '+' : ''}\u20B9${trade.returnVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                            </td>
-                            <td class="py-4 px-6">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Closed
-                                </span>
-                            </td>
-                            <td class="py-4 px-6 text-xs text-slate-400 font-medium max-w-xs truncate">${trade.remarks || '-'}</td>
                         </tr>
                     `;
-                    tableBody.insertAdjacentHTML('beforeend', rowHtml);
+                    tableBody.insertAdjacentHTML('beforeend', headerHtml);
+
+                    // Add Individual Trades for this Month
+                    monthTrades.forEach(trade => {
+                        const isProfit = trade.returnVal >= 0;
+                        const rowHtml = `
+                            <tr class="border-b border-slate-800/40 hover:bg-slate-900/35 transition-colors duration-150">
+                                <td class="py-4 px-6 font-bold text-slate-200 whitespace-nowrap pl-8">${trade.date}</td>
+                                <td class="py-4 px-6">
+                                    <span class="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                        NIFTY-50
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 font-semibold text-slate-300">\u20B9${trade.buy.toLocaleString('en-IN', { minimumFractionDigits: 1 })}</td>
+                                <td class="py-4 px-6 font-semibold text-slate-300">\u20B9${trade.sell.toLocaleString('en-IN', { minimumFractionDigits: 1 })}</td>
+                                <td class="py-4 px-6 font-semibold ${trade.pl >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                                    ${trade.pl >= 0 ? '+' : ''}\u20B9${trade.pl.toLocaleString('en-IN', { minimumFractionDigits: 1 })}
+                                </td>
+                                <td class="py-4 px-6 font-extrabold ${isProfit ? 'text-emerald-400 bg-emerald-500/5' : 'text-rose-400 bg-rose-500/5'} rounded-lg">
+                                    ${isProfit ? '+' : ''}\u20B9${trade.returnVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                </td>
+                                <td class="py-4 px-6">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Closed
+                                    </span>
+                                </td>
+                                <td class="py-4 px-6 text-xs text-slate-400 font-medium max-w-xs truncate">${trade.remarks || '-'}</td>
+                            </tr>
+                        `;
+                        tableBody.insertAdjacentHTML('beforeend', rowHtml);
+                    });
                 });
             }
 
@@ -1260,4 +1309,3 @@
     </script>
 </body>
 </html>
-```[cite: 2]
