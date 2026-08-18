@@ -112,7 +112,6 @@
         </marquee>
     </div>
 
-
     <!-- LOGIN PORTAL CONTAINER -->
     <div id="loginPortal" class="flex-grow flex items-center justify-center px-4 py-16 relative z-10">
         <div class="max-w-md w-full space-y-6 glass-card p-8 rounded-3xl shadow-2xl border border-slate-800 relative overflow-hidden">
@@ -270,7 +269,6 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <!-- Share Update Button placed right where requested -->
                         <button onclick="shareDashboardDetails()" class="px-3.5 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/30 rounded-xl text-xs font-semibold text-indigo-300 transition flex items-center gap-1.5 cursor-pointer shadow-md">
                             <i class="fa-solid fa-share-nodes"></i> Share Update
                         </button>
@@ -280,7 +278,6 @@
                     </div>
                 </div>
 
-                <!-- Setup Content Area (Dynamic Call/Put, Buy, Sale prices ONLY) -->
                 <div id="todaysTradeBody">
                     <!-- Loaded dynamically or shows awaiting placeholder -->
                 </div>
@@ -288,7 +285,6 @@
 
             <!-- KPI Cards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-                <!-- Highlighted: Total Invested Value -->
                 <div class="glass-card glowing-gold p-6 rounded-2xl relative overflow-hidden shadow-xl border-l-4 border-l-amber-500">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl"></div>
                     <div class="flex justify-between items-start">
@@ -304,7 +300,6 @@
                     </p>
                 </div>
 
-                <!-- Total Fund Capital -->
                 <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden shadow-lg border-l-4 border-l-emerald-500">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl"></div>
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Total Current Fund</p>
@@ -318,7 +313,6 @@
                     </p>
                 </div>
 
-                <!-- Total Net P&L -->
                 <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden shadow-lg border-l-4 border-l-indigo-500">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl"></div>
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Net Profit (Aggregated)</p>
@@ -326,7 +320,6 @@
                     <p class="text-xs text-slate-400 mt-2">Sum of Nifty-50 closed trades</p>
                 </div>
 
-                <!-- Share Per Member -->
                 <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden shadow-lg">
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Value Per Member (1 Share)</p>
                     <div class="flex items-baseline gap-2">
@@ -336,7 +329,6 @@
                     <p class="text-xs text-slate-400 mt-2">Divided equally among 7 partners</p>
                 </div>
 
-                <!-- Total Trades -->
                 <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden">
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Executed Trades</p>
                     <h2 id="tradesCount" class="text-3xl font-extrabold text-indigo-400">0 <span class="text-sm font-medium text-slate-400">Closed</span></h2>
@@ -363,12 +355,11 @@
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4" id="membersGrid">
-                    <!-- Dynamically populated by script (Avatars & calculations) -->
+                    <!-- Dynamically populated -->
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Line Chart (Fund Trend) -->
                 <div class="glass-card p-5 rounded-2xl lg:col-span-2">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -381,7 +372,6 @@
                     </div>
                 </div>
 
-                <!-- Bar Chart (Individual returns) -->
                 <div class="glass-card p-5 rounded-2xl">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -404,7 +394,7 @@
                         <p class="text-xs text-slate-400 mt-0.5">Filter automatically bypasses empty formulic rows</p>
                     </div>
                     
-                    <!-- ADDED: MONTH FILTER DROPDOWN HERE -->
+                    <!-- MONTH FILTER DROPDOWN -->
                     <div class="flex items-center gap-3 flex-wrap">
                         <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
                             <i class="fa-solid fa-filter text-xs text-indigo-400"></i>
@@ -452,7 +442,6 @@
     </footer>
 
     <script>
-        // Default Google Sheet Link shared by User
         const defaultSheetUrl = "https://docs.google.com/spreadsheets/d/1OiAddKrNDZeIc1_A_Xd9tDygugaD-oaWByPAjT4ntcc/edit?gid=43965844#gid=43965844";
 
         const maleAvatarSvg = `
@@ -884,7 +873,6 @@
                     </div>
                 </div>
 
-                <!-- BUY Button + Broker List -->
                 <div class="mt-5 pt-5 border-t border-slate-800/70">
                     <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
                         <button type="button"
@@ -1107,16 +1095,15 @@
                 membersGrid.insertAdjacentHTML('beforeend', cardHtml);
             });
 
-            // Populate Month Filter Dropdown Dynamically
+            // Populate Month Filter Dropdown Dynamically with DEFAULT CURRENT MONTH selected
             populateMonthFilterOptions(data.trades);
 
-            // Render Trades Table
-            renderTradesTable(data.trades);
+            // Trigger filtering based on default selected value
+            filterTradesByMonth();
 
             renderInteractiveCharts(data, startingPool);
         }
 
-        // Helper function to extract Month Key (YYYY-MM) from Date string DD-MM-YYYY
         function getMonthKeyFromDateStr(dateStr) {
             if (!dateStr) return null;
             const parts = dateStr.split('-');
@@ -1126,9 +1113,18 @@
             return null;
         }
 
+        // Helper function to get current Indian Month Key (YYYY-MM)
+        function getCurrentMonthKey() {
+            const options = { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit' };
+            const parts = new Intl.DateTimeFormat('en-US', options).formatToParts(new Date());
+            const year = parts.find(p => p.type === 'year').value;
+            const month = parts.find(p => p.type === 'month').value;
+            return `${year}-${month}`;
+        }
+
         function populateMonthFilterOptions(trades) {
             const selectEl = document.getElementById('tradeMonthFilter');
-            const selectedVal = selectEl.value || 'ALL';
+            const currentMonthKey = getCurrentMonthKey();
             
             const monthMap = {};
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -1147,12 +1143,22 @@
             });
 
             let optionsHtml = `<option value="ALL" class="bg-slate-900 text-slate-200">All Months</option>`;
-            Object.keys(monthMap).sort().reverse().forEach(key => {
+            const sortedKeys = Object.keys(monthMap).sort().reverse();
+            
+            sortedKeys.forEach(key => {
                 optionsHtml += `<option value="${key}" class="bg-slate-900 text-slate-200">${monthMap[key]}</option>`;
             });
 
             selectEl.innerHTML = optionsHtml;
-            selectEl.value = monthMap[selectedVal] || selectedVal === 'ALL' ? selectedVal : 'ALL';
+
+            // DEFAULT SETTING: Select Current Month if available in trades, otherwise select the latest available month, else ALL
+            if (monthMap[currentMonthKey]) {
+                selectEl.value = currentMonthKey;
+            } else if (sortedKeys.length > 0) {
+                selectEl.value = sortedKeys[0]; // latest available month
+            } else {
+                selectEl.value = 'ALL';
+            }
         }
 
         function filterTradesByMonth() {
@@ -1176,7 +1182,7 @@
                 tableBody.innerHTML = `
                     <tr>
                         <td colspan="8" class="text-center py-8 text-slate-500 font-medium italic">
-                            No active trades found for the selected filter.
+                            No active trades found for the selected month filter.
                         </td>
                     </tr>
                 `;
