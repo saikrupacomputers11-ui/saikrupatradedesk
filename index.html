@@ -1440,26 +1440,18 @@
             showToast("WhatsApp update generated!");
         }
 
-        // WhatsApp Share for Learning Note
+        // WhatsApp Share for Learning Note (FIXED FUNCTION)
         function shareLearningNote() {
             const learningContent = document.getElementById('learningText')?.innerText || "Daily Trading Insight";
             
-            const textMsg = `📚 *SaiKrupa TradeDesk - Learning Of The Day* 📚%0A%0A` +
-                            `"${encodeURIComponent(learningContent)}"%0A%0A` +
-                            `📢 *Join Our Channel:* https://whatsapp.com/channel/0029VbCzdJg8KMqfHLiFLa0d%0A%0A` +
+            const textMsg = `📚 *SaiKrupa TradeDesk - Learning Of The Day* 📚\n\n` +
+                            `"${learningContent}"\n\n` +
+                            `📢 *Join Our Channel:* https://whatsapp.com/channel/0029VbCzdJg8KMqfHLiFLa0d\n\n` +
                             `👉 *Live Dashboard:* ${window.location.href}`;
 
-            window.open(`https://api.whatsapp.com/send?text=${textMsg}`, '_blank');
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textMsg)}`, '_blank');
             showToast("Learning Note WhatsApp share generated!");
         }
     </script>
-<script>
-  document.querySelectorAll('button').forEach(button => {
-    button.addEventListener('click', function(e) {
-      // Button click handle karne ke liye code yahan aayega
-      console.log('Button clicked:', this.innerText);
-    });
-  });
-</script>
 </body>
 </html>
