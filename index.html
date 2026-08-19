@@ -320,7 +320,7 @@
                     <p class="text-xs text-slate-400 mt-2">Sum of Nifty-50 closed trades</p>
                 </div>
 
-                <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden shadow-lg">
+                <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden">
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Value Per Member (1 Share)</p>
                     <div class="flex items-baseline gap-2">
                         <h2 id="perMemberValue" class="text-3xl font-extrabold text-white">&#8377;1,000.00</h2>
@@ -418,12 +418,12 @@
                             <tr class="border-b border-slate-800 bg-slate-950/20 text-xs font-semibold text-slate-400 uppercase tracking-wider">
                                 <th class="py-4 px-6">Trade Date</th>
                                 <th class="py-4 px-6">Instrument</th>
-                                <th class="py-4 px-6 text-emerald-400 bg-emerald-950/20">Buy Price</th>
-                                <th class="py-4 px-6 text-emerald-400 bg-emerald-950/20">Buy Qty</th>
-                                <th class="py-4 px-6 text-emerald-400 bg-emerald-950/30">Buy Total</th>
-                                <th class="py-4 px-6 text-rose-400 bg-rose-950/20">Sale Price</th>
-                                <th class="py-4 px-6 text-rose-400 bg-rose-950/20">Sale Qty</th>
-                                <th class="py-4 px-6 text-rose-400 bg-rose-950/30">Sell Total</th>
+                                <th class="py-4 px-6">Buy Price</th>
+                                <th class="py-4 px-6">Buy Qty</th>
+                                <th class="py-4 px-6">Buy Total</th>
+                                <th class="py-4 px-6">Sale Price</th>
+                                <th class="py-4 px-6">Sale Qty</th>
+                                <th class="py-4 px-6">Sell Total</th>
                                 <th class="py-4 px-6">Gross P&L</th>
                                 <th class="py-4 px-6">Net Return (After Charges)</th>
                                 <th class="py-4 px-6">Status</th>
@@ -493,8 +493,8 @@
                 { name: "Gaurav Sir", investment: 1000 }
             ],
             trades: [
-                { date: "29-06-2026", buyPrice: 78.00, buyQty: 25, buy: 1950.00, salePrice: 81.38, saleQty: 25, sell: 2034.50, pl: 84.50, returnVal: 34.50, remarks: "Trail SL Triggered" },
-                { date: "30-06-2026", buyPrice: 67.60, buyQty: 50, buy: 3380.00, salePrice: 144.30, saleQty: 50, sell: 7215.00, pl: 3835.00, returnVal: 3785.00, remarks: "1st Target Done but move up to max-90" }
+                { date: "29-06-2026", buyPrice: 26.00, buyQty: 75, buy: 1950.00, salePrice: 27.12, saleQty: 75, sell: 2034.50, pl: 84.50, returnVal: 34.50, remarks: "Trail SL Triggered" },
+                { date: "30-06-2026", buyPrice: 45.06, buyQty: 75, buy: 3380.00, salePrice: 96.20, saleQty: 75, sell: 7215.00, pl: 3835.00, returnVal: 3785.00, remarks: "1st Target Done but move up to max-90" }
             ],
             startingCapital: 7000,
             currentCapital: 10819.50,
@@ -939,15 +939,15 @@
 
         function mapTableRowsToDataset(rows) {
             let tradeDateColIdx = 5;
-            let buyPriceColIdx = 9;
-            let buyQtyColIdx = 10;
+            let buyPriceColIdx = 7;
+            let buyQtyColIdx = 8;
             let buyTotalColIdx = 11;
-            let sellPriceColIdx = 12;
-            let sellQtyColIdx = 13;
-            let sellTotalColIdx = 14;
-            let grossPlColIdx = 15;
-            let netReturnColIdx = 16;
-            let remarksColIdx = 19;
+            let salePriceColIdx = 9;
+            let saleQtyColIdx = 10;
+            let sellTotalColIdx = 12;
+            let grossPlColIdx = 13;
+            let netReturnColIdx = 14;
+            let remarksColIdx = 17;
 
             for (let r = 0; r < Math.min(rows.length, 15); r++) {
                 const row = rows[r];
@@ -956,15 +956,15 @@
                 const tDateIdx = rowText.indexOf("trade date");
                 if (tDateIdx !== -1) {
                     tradeDateColIdx = tDateIdx;
-                    buyPriceColIdx = tradeDateColIdx + 4;
-                    buyQtyColIdx = tradeDateColIdx + 5;
+                    buyPriceColIdx = tradeDateColIdx + 2;
+                    buyQtyColIdx = tradeDateColIdx + 3;
+                    salePriceColIdx = tradeDateColIdx + 4;
+                    saleQtyColIdx = tradeDateColIdx + 5;
                     buyTotalColIdx = tradeDateColIdx + 6;
-                    sellPriceColIdx = tradeDateColIdx + 7;
-                    sellQtyColIdx = tradeDateColIdx + 8;
-                    sellTotalColIdx = tradeDateColIdx + 9;
-                    grossPlColIdx = tradeDateColIdx + 10;
-                    netReturnColIdx = tradeDateColIdx + 11;
-                    remarksColIdx = tradeDateColIdx + 14;
+                    sellTotalColIdx = tradeDateColIdx + 7;
+                    grossPlColIdx = tradeDateColIdx + 8;
+                    netReturnColIdx = tradeDateColIdx + 9;
+                    remarksColIdx = tradeDateColIdx + 12;
                     break;
                 }
             }
@@ -980,7 +980,7 @@
                 const getNumericValue = (val) => {
                     if (val === null || val === undefined) return 0;
                     if (typeof val === 'number') return val;
-                    const cleanString = String(val).replace(/[₹₹&#8377;,\s]/g, '');
+                    const cleanString = String(val).replace(/[₹\u20B9&#8377;,\s]/g, '');
                     return parseFloat(cleanString) || 0;
                 };
 
@@ -988,22 +988,22 @@
                 const buyQtyVal = getNumericValue(row[buyQtyColIdx]);
                 const buyVal = getNumericValue(row[buyTotalColIdx]);
                 
-                const sellPriceVal = getNumericValue(row[sellPriceColIdx]);
-                const sellQtyVal = getNumericValue(row[sellQtyColIdx]);
+                const salePriceVal = getNumericValue(row[salePriceColIdx]);
+                const saleQtyVal = getNumericValue(row[saleQtyColIdx]);
                 const sellVal = getNumericValue(row[sellTotalColIdx]);
-
+                
                 const plVal = getNumericValue(row[grossPlColIdx]);
                 const returnVal = getNumericValue(row[netReturnColIdx]);
                 const remark = String(row[remarksColIdx] || "");
 
-                if (buyVal > 0 || sellVal > 0 || buyPriceVal > 0) {
+                if (buyVal > 0 || sellVal > 0 || buyPriceVal > 0 || salePriceVal > 0) {
                     parsedTrades.push({
                         date: dateVal,
                         buyPrice: buyPriceVal,
                         buyQty: buyQtyVal,
                         buy: buyVal,
-                        salePrice: sellPriceVal,
-                        saleQty: sellQtyVal,
+                        salePrice: salePriceVal,
+                        saleQty: saleQtyVal,
                         sell: sellVal,
                         pl: plVal,
                         returnVal: returnVal,
@@ -1024,7 +1024,7 @@
                                      cellName.toLowerCase().includes("mam");
 
                 if (isMemberName) {
-                    const cleanInvestVal = String(row[2] || "1000").replace(/[₹₹&#8377;,\s]/g, '');
+                    const cleanInvestVal = String(row[2] || "1000").replace(/[₹\u20B9&#8377;,\s]/g, '');
                     const cellInvestment = parseFloat(cleanInvestVal) || 1000;
                     
                     if (!parsedMembers.some(m => m.name === cellName)) {
@@ -1066,8 +1066,8 @@
 
             document.getElementById('memberCountBadge').innerText = `${memberCount} Shares Total`;
 
-            document.getElementById('totalInvested').innerText = `₹${startingPool.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('totalCapital').innerText = `₹${currentPool.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('totalInvested').innerText = `\u20B9${startingPool.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('totalCapital').innerText = `\u20B9${currentPool.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
             const growthBadge = document.getElementById('totalGrowthBadge');
             growthBadge.innerText = `${profitPercentage >= 0 ? '+' : ''}${profitPercentage.toFixed(2)}%`;
@@ -1077,11 +1077,11 @@
                 growthBadge.className = "text-[10px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/20";
             }
 
-            document.getElementById('totalProfit').innerText = `${netProfit >= 0 ? '+' : ''}₹${netProfit.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('totalProfit').innerText = `${netProfit >= 0 ? '+' : ''}\u20B9${netProfit.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('totalProfit').className = `text-3xl font-extrabold ${netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
 
-            document.getElementById('perMemberValue').innerText = `₹${valuePerMember.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('perMemberProfitBadge').innerText = `${profitPerMember >= 0 ? '+' : ''}₹${profitPerMember.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('perMemberValue').innerText = `\u20B9${valuePerMember.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('perMemberProfitBadge').innerText = `${profitPerMember >= 0 ? '+' : ''}\u20B9${profitPerMember.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             if (profitPerMember >= 0) {
                 document.getElementById('perMemberProfitBadge').className = "text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20";
             } else {
@@ -1111,10 +1111,10 @@
                         </div>
                         <h4 class="text-xs font-bold text-white mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis w-full">${member.name}</h4>
                         <div class="space-y-1 w-full">
-                            <p class="text-[9px] text-slate-500 uppercase tracking-widest font-semibold">Initial: ₹${member.investment.toLocaleString('en-IN')}</p>
-                            <div class="text-sm font-extrabold text-slate-100">₹${valuePerMember.toLocaleString('en-IN', { maximumFractionDigits: 1 })}</div>
+                            <p class="text-[9px] text-slate-500 uppercase tracking-widest font-semibold">Initial: \u20B9${member.investment.toLocaleString('en-IN')}</p>
+                            <div class="text-sm font-extrabold text-slate-100">\u20B9${valuePerMember.toLocaleString('en-IN', { maximumFractionDigits: 1 })}</div>
                             <span class="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-md font-bold inline-block mt-1">
-                                +₹${profitPerMember.toLocaleString('en-IN', { maximumFractionDigits: 1 })}
+                                +\u20B9${profitPerMember.toLocaleString('en-IN', { maximumFractionDigits: 1 })}
                             </span>
                         </div>
                     </div>
@@ -1228,10 +1228,10 @@
 
             tradesList.forEach(trade => {
                 const isProfit = trade.returnVal >= 0;
-                const buyPriceFormatted = trade.buyPrice ? `₹${trade.buyPrice.toLocaleString('en-IN', { minimumFractionDigits: 1 })}` : '-';
-                const buyQtyFormatted = trade.buyQty ? `${trade.buyQty}` : '-';
-                const salePriceFormatted = trade.salePrice ? `₹${trade.salePrice.toLocaleString('en-IN', { minimumFractionDigits: 1 })}` : '-';
-                const saleQtyFormatted = trade.saleQty ? `${trade.saleQty}` : '-';
+                const buyPriceFormatted = trade.buyPrice ? `\u20B9${trade.buyPrice.toLocaleString('en-IN', { minimumFractionDigits: 1 })}` : '-';
+                const buyQtyFormatted = trade.buyQty ? trade.buyQty.toLocaleString('en-IN') : '-';
+                const salePriceFormatted = trade.salePrice ? `\u20B9${trade.salePrice.toLocaleString('en-IN', { minimumFractionDigits: 1 })}` : '-';
+                const saleQtyFormatted = trade.saleQty ? trade.saleQty.toLocaleString('en-IN') : '-';
 
                 const rowHtml = `
                     <tr class="border-b border-slate-800/40 hover:bg-slate-900/35 transition-colors duration-150">
@@ -1241,17 +1241,17 @@
                                 NIFTY-50
                             </span>
                         </td>
-                        <td class="py-4 px-6 font-semibold text-emerald-400 bg-emerald-950/10">${buyPriceFormatted}</td>
-                        <td class="py-4 px-6 font-semibold text-emerald-300 bg-emerald-950/10">${buyQtyFormatted}</td>
-                        <td class="py-4 px-6 font-bold text-emerald-400 bg-emerald-950/20">₹${trade.buy.toLocaleString('en-IN', { minimumFractionDigits: 1 })}</td>
-                        <td class="py-4 px-6 font-semibold text-rose-400 bg-rose-950/10">${salePriceFormatted}</td>
-                        <td class="py-4 px-6 font-semibold text-rose-300 bg-rose-950/10">${saleQtyFormatted}</td>
-                        <td class="py-4 px-6 font-bold text-rose-400 bg-rose-950/20">₹${trade.sell.toLocaleString('en-IN', { minimumFractionDigits: 1 })}</td>
+                        <td class="py-4 px-6 font-semibold text-emerald-300/90">${buyPriceFormatted}</td>
+                        <td class="py-4 px-6 font-semibold text-slate-300">${buyQtyFormatted}</td>
+                        <td class="py-4 px-6 font-semibold text-slate-300">\u20B9${trade.buy.toLocaleString('en-IN', { minimumFractionDigits: 1 })}</td>
+                        <td class="py-4 px-6 font-semibold text-amber-300/90">${salePriceFormatted}</td>
+                        <td class="py-4 px-6 font-semibold text-slate-300">${saleQtyFormatted}</td>
+                        <td class="py-4 px-6 font-semibold text-slate-300">\u20B9${trade.sell.toLocaleString('en-IN', { minimumFractionDigits: 1 })}</td>
                         <td class="py-4 px-6 font-semibold ${trade.pl >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
-                            ${trade.pl >= 0 ? '+' : ''}₹${trade.pl.toLocaleString('en-IN', { minimumFractionDigits: 1 })}
+                            ${trade.pl >= 0 ? '+' : ''}\u20B9${trade.pl.toLocaleString('en-IN', { minimumFractionDigits: 1 })}
                         </td>
                         <td class="py-4 px-6 font-extrabold ${isProfit ? 'text-emerald-400 bg-emerald-500/5' : 'text-rose-400 bg-rose-500/5'} rounded-lg">
-                            ${isProfit ? '+' : ''}₹${trade.returnVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                            ${isProfit ? '+' : ''}\u20B9${trade.returnVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                         </td>
                         <td class="py-4 px-6">
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -1284,7 +1284,7 @@
                 data: {
                     labels: chartLabels,
                     datasets: [{
-                        label: 'Pool Valuation (₹)',
+                        label: 'Pool Valuation (\u20B9)',
                         data: growthPoints,
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.04)',
@@ -1331,7 +1331,7 @@
                 data: {
                     labels: barLabels,
                     datasets: [{
-                        label: 'Net Return (₹)',
+                        label: 'Net Return (\u20B9)',
                         data: barData,
                         backgroundColor: barData.map(v => v >= 0 ? '#10b981' : '#f43f5e'),
                         borderRadius: 8,
