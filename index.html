@@ -1441,17 +1441,20 @@
         }
 
         // WhatsApp Share for Learning Note (FIXED FUNCTION)
-        function shareLearningNote() {
-            const learningContent = document.getElementById('learningText')?.innerText || "Daily Trading Insight";
-            
-            const textMsg = `📚 *SaiKrupa TradeDesk - Learning Of The Day* 📚\n\n` +
-                            `"${learningContent}"\n\n` +
-                            `📢 *Join Our Channel:* https://whatsapp.com/channel/0029VbCzdJg8KMqfHLiFLa0d\n\n` +
-                            `👉 *Live Dashboard:* ${window.location.href}`;
+function shareLearningNote() {
+    const learningContent = document.getElementById('learningText')?.innerText?.trim() || "Daily Trading Insight";
+    
+    const textMsg = `📚 *SaiKrupa TradeDesk - Learning Of The Day* 📚\n\n` +
+                    `"${learningContent}"\n\n` +
+                    `📢 *Join Our Channel:* https://whatsapp.com/channel/0029VbCzdJg8KMqfHLiFLa0d\n\n` +
+                    `👉 *Live Dashboard:* ${window.location.href}`;
 
-            window.open(`https://api.whatsapp.com/send?text=${textMsg}`, '_blank');
-            showToast("Learning Note WhatsApp share generated!");
-        }
+    // Properly encode the message payload including newlines
+    const encodedMsg = encodeURIComponent(textMsg);
+
+    window.open(`https://api.whatsapp.com/send?text=${encodedMsg}`, '_blank', 'noopener,noreferrer');
+    showToast("Learning Note WhatsApp share generated!");
+}
     </script>
 </body>
 </html>
