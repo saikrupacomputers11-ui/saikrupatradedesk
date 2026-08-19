@@ -1453,5 +1453,13 @@
             showToast("Learning Note WhatsApp share generated!");
         }
     </script>
+<script>
+  document.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', function(e) {
+      // Button click handle karne ke liye code yahan aayega
+      console.log('Button clicked:', this.innerText);
+    });
+  });
+</script>
 </body>
 </html>
