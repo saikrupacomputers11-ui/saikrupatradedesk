@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
@@ -283,6 +283,34 @@
                 </div>
             </div>
 
+            <!-- 📚 LEARNING OF THE DAY CONTAINER 📚 -->
+            <div id="learningContainer" class="glass-card glowing-border p-6 rounded-3xl relative overflow-hidden shadow-2xl transition-all duration-300">
+                <div class="absolute top-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
+                
+                <div class="flex items-center gap-3 border-b border-slate-800/60 pb-4 mb-4">
+                    <div class="h-10 w-10 bg-indigo-500/10 border border-indigo-500/25 rounded-2xl flex items-center justify-center text-indigo-400 shrink-0">
+                        <i class="fa-solid fa-graduation-cap text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-white flex items-center gap-2">
+                            📚 LEARNING OF THE DAY 📚
+                        </h3>
+                        <p class="text-[11px] text-slate-400 font-medium">Live insight synced directly from Database</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/60 border border-indigo-500/20 p-5 rounded-2xl relative">
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid fa-quote-left text-indigo-400/40 text-2xl mt-1 shrink-0"></i>
+                        <div>
+                            <p id="learningText" class="text-xs text-slate-200 leading-relaxed font-semibold whitespace-pre-wrap">
+                                Loading daily learning notes...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- KPI Cards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
                 <div class="glass-card glowing-gold p-6 rounded-2xl relative overflow-hidden shadow-xl border-l-4 border-l-amber-500">
@@ -501,7 +529,8 @@
                 instrument: "NIFTY 24300 CE (DEMO PREVIEW)",
                 buyPrice: "44.00",
                 salePrice: "87.00"
-            }
+            },
+            learningText: "Risk Management Over Emotions: Market me hamesha Stop-Loss ke sath trade karein. Loss ko accept karna seekhein aur revenge trading se bachein."
         };
 
         let activeData = { ...demoBackupData };
@@ -533,7 +562,7 @@
             const usernameInput = document.getElementById('loginUser').value.trim();
             const passwordInput = document.getElementById('loginPass').value.trim();
 
-            if (usernameInput.toLowerCase() === 'saikrupa' && passwordInput === 'Sai_Krupa@123') {
+            if (usernameInput.toLowerCase() === 'saikrupa' && passwordInput === 'Saikrupa@123') {
                 localStorage.setItem('saikrupa_logged_in', 'true');
                 document.getElementById('loginError').classList.add('hidden');
                 document.getElementById('loginPortal').classList.add('hidden');
@@ -715,6 +744,9 @@
                 const targetedSetup = extractTradeSetupFromRows(parsedRows);
                 const parsedDataset = mapTableRowsToDataset(parsedRows);
                 
+                // Fetch Learning Text from Merged Cell U11:AB11
+                parsedDataset.learningText = extractLearningFromU11(parsedRows);
+
                 if (targetedSetup) {
                     parsedDataset.todaysTrade = targetedSetup;
                 } else {
@@ -746,6 +778,30 @@
                 `;
                 document.getElementById('syncStatus').className = "px-3.5 py-1.5 text-xs font-semibold rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center gap-2";
             }
+        }
+
+        // Dedicated helper function to fetch U11 (Row 11, Column U -> Index Row 10, Index Col 20)
+        function extractLearningFromU11(rows) {
+            try {
+                // Check exact cell U11 (Row 10, Col 20)
+                if (rows && rows.length > 10 && rows[10] && rows[10].length > 20) {
+                    const u11Val = String(rows[10][20] || "").trim();
+                    if (u11Val) return u11Val;
+                }
+
+                // Fallback scan across Row 11 (index 10) in case columns shifted
+                if (rows && rows.length > 10 && rows[10]) {
+                    for (let c = 18; c <= 27; c++) {
+                        const cellVal = String(rows[10][c] || "").trim();
+                        if (cellVal && !cellVal.toLowerCase().includes("total") && cellVal.length > 3) {
+                            return cellVal;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn("Could not read U11 cell: ", e);
+            }
+            return "No Learning update available for today. Add text in Cell U11 of your Google Sheet.";
         }
 
         function extractTradeSetupFromRows(rows) {
@@ -1059,6 +1115,11 @@
             const profitPerMember = netProfit / memberCount;
 
             renderTodaysTradeWidget(data.todaysTrade);
+
+            // Render Learning of the day from Google Sheet U11
+            if (data.learningText) {
+                document.getElementById('learningText').innerText = data.learningText;
+            }
 
             document.getElementById('memberCountBadge').innerText = `${memberCount} Shares Total`;
 
