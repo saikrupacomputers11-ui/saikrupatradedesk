@@ -296,7 +296,7 @@
                             <h3 class="text-base font-black text-white flex items-center gap-2">
                                 📚 LEARNING OF THE DAY 📚
                             </h3>
-                            <p class="text-[11px] text-slate-400 font-medium">Live insight synced directly from database</p>
+                            <p class="text-[11px] text-slate-400 font-medium">Live insight synced directly from Google Sheet (Cell U11:AB11)</p>
                         </div>
                     </div>
 
@@ -1440,13 +1440,18 @@
             showToast("WhatsApp update generated!");
         }
 
-        // WhatsApp Share for Learning Note (FIXED FUNCTION)
-      const textMsg = `📚 *SaiKrupa TradeDesk - Learning Of The Day* 📚\n\n` +
-                    `"${learningContent}"\n\n` +
-                    `📢 *Join Our Channel:* https://whatsapp.com/channel/0029VbCzdJg8KMqfHLiFLa0d\n\n` +
+        // WhatsApp Share for Learning Note
+        function shareLearningNote() {
+            const learningContent = document.getElementById('learningText')?.innerText || "Daily Trading Insight";
+            
+            const textMsg = `📚 *SaiKrupa TradeDesk - Learning Of The Day* 📚%0A%0A` +
+                            `"${encodeURIComponent(learningContent)}"%0A%0A` +
+                            `📢 *Join Our Channel:* https://whatsapp.com/channel/0029VbCzdJg8KMqfHLiFLa0d%0A%0A` +
+                            `👉 *Live Dashboard:* ${window.location.href}`;
+
             window.open(`https://api.whatsapp.com/send?text=${textMsg}`, '_blank');
             showToast("Learning Note WhatsApp share generated!");
-}
+        }
     </script>
 </body>
 </html>
