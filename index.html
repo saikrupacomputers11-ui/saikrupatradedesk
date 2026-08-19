@@ -394,7 +394,7 @@
                         <p class="text-xs text-slate-400 mt-0.5">Filter automatically bypasses empty formulic rows</p>
                     </div>
                     
-                    <!-- MONTH FILTER DROPDOWN -->
+                    <!-- MONTH FILTER DROPDOWN & TOTAL PnL DISPLAY -->
                     <div class="flex items-center gap-3 flex-wrap">
                         <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
                             <i class="fa-solid fa-filter text-xs text-indigo-400"></i>
@@ -403,7 +403,12 @@
                                 <option value="ALL" class="bg-slate-900 text-slate-200">All Months</option>
                             </select>
                         </div>
-                        <span class="text-xs text-slate-400 italic bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">Sort: Date Descending</span>
+
+                        <!-- Dynamic Header PnL Badge -->
+                        <div class="flex items-center gap-2 bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800">
+                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Total PnL:</span>
+                            <span id="monthlyTotalPnL" class="text-xs font-extrabold text-emerald-400">+₹0.00</span>
+                        </div>
                     </div>
                 </div>
                 
@@ -1178,6 +1183,16 @@
             const tableBody = document.getElementById('tradesTableBody');
             tableBody.innerHTML = "";
             
+            // Total PnL Calculation for the displayed filtered list
+            const totalPnL = (tradesList || []).reduce((sum, t) => sum + (t.returnVal || 0), 0);
+            const pnlDisplay = document.getElementById('monthlyTotalPnL');
+            
+            if (pnlDisplay) {
+                const formattedPnL = `${totalPnL >= 0 ? '+' : ''}₹${Math.abs(totalPnL).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                pnlDisplay.innerText = formattedPnL;
+                pnlDisplay.className = `text-xs font-extrabold ${totalPnL >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+            }
+
             if (!tradesList || tradesList.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
