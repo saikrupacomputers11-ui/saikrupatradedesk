@@ -418,11 +418,9 @@
                             <tr class="border-b border-slate-800 bg-slate-950/20 text-xs font-semibold text-slate-400 uppercase tracking-wider">
                                 <th class="py-4 px-6">Trade Date</th>
                                 <th class="py-4 px-6">Instrument</th>
-                                <th class="py-4 px-6">Buy Price</th>
-                                <th class="py-4 px-6">Buy Qty</th>
+                                <th class="py-4 px-6">Buy Price | Buy Qty</th>
                                 <th class="py-4 px-6">Buy Total</th>
-                                <th class="py-4 px-6">Sale Price</th>
-                                <th class="py-4 px-6">Sale Qty</th>
+                                <th class="py-4 px-6">Sale Price | Sale Qty</th>
                                 <th class="py-4 px-6">Sell Total</th>
                                 <th class="py-4 px-6">Gross P&L</th>
                                 <th class="py-4 px-6">Net Return (After Charges)</th>
@@ -938,16 +936,16 @@
         }
 
         function mapTableRowsToDataset(rows) {
-            let tradeDateColIdx = 5;
-            let buyPriceColIdx = 7;
-            let buyQtyColIdx = 8;
-            let buyTotalColIdx = 11;
-            let salePriceColIdx = 9;
-            let saleQtyColIdx = 10;
-            let sellTotalColIdx = 12;
-            let grossPlColIdx = 13;
-            let netReturnColIdx = 14;
-            let remarksColIdx = 17;
+            let tradeDateColIdx = 5; // Column F
+            let buyPriceColIdx = 6;  // Column G
+            let buyQtyColIdx = 7;    // Column H
+            let buyTotalColIdx = 11; // Column L
+            let salePriceColIdx = 8; // Column I
+            let saleQtyColIdx = 9;   // Column J
+            let sellTotalColIdx = 12; // Column M
+            let grossPlColIdx = 13;   // Column N
+            let netReturnColIdx = 14; // Column O
+            let remarksColIdx = 17;   // Column R
 
             for (let r = 0; r < Math.min(rows.length, 15); r++) {
                 const row = rows[r];
@@ -956,15 +954,15 @@
                 const tDateIdx = rowText.indexOf("trade date");
                 if (tDateIdx !== -1) {
                     tradeDateColIdx = tDateIdx;
-                    buyPriceColIdx = tradeDateColIdx + 2;
-                    buyQtyColIdx = tradeDateColIdx + 3;
-                    salePriceColIdx = tradeDateColIdx + 4;
-                    saleQtyColIdx = tradeDateColIdx + 5;
-                    buyTotalColIdx = tradeDateColIdx + 6;
-                    sellTotalColIdx = tradeDateColIdx + 7;
-                    grossPlColIdx = tradeDateColIdx + 8;
-                    netReturnColIdx = tradeDateColIdx + 9;
-                    remarksColIdx = tradeDateColIdx + 12;
+                    buyPriceColIdx = tradeDateColIdx + 1;  // G
+                    buyQtyColIdx = tradeDateColIdx + 2;    // H
+                    salePriceColIdx = tradeDateColIdx + 3; // I
+                    saleQtyColIdx = tradeDateColIdx + 4;   // J
+                    buyTotalColIdx = tradeDateColIdx + 6;  // L
+                    sellTotalColIdx = tradeDateColIdx + 7; // M
+                    grossPlColIdx = tradeDateColIdx + 8;   // N
+                    netReturnColIdx = tradeDateColIdx + 9; // O
+                    remarksColIdx = tradeDateColIdx + 12;  // R
                     break;
                 }
             }
@@ -987,16 +985,14 @@
                 const buyPriceVal = getNumericValue(row[buyPriceColIdx]);
                 const buyQtyVal = getNumericValue(row[buyQtyColIdx]);
                 const buyVal = getNumericValue(row[buyTotalColIdx]);
-                
                 const salePriceVal = getNumericValue(row[salePriceColIdx]);
                 const saleQtyVal = getNumericValue(row[saleQtyColIdx]);
                 const sellVal = getNumericValue(row[sellTotalColIdx]);
-                
                 const plVal = getNumericValue(row[grossPlColIdx]);
                 const returnVal = getNumericValue(row[netReturnColIdx]);
                 const remark = String(row[remarksColIdx] || "");
 
-                if (buyVal > 0 || sellVal > 0 || buyPriceVal > 0 || salePriceVal > 0) {
+                if (buyVal > 0 || sellVal > 0 || buyPriceVal > 0) {
                     parsedTrades.push({
                         date: dateVal,
                         buyPrice: buyPriceVal,
@@ -1218,7 +1214,7 @@
             if (!tradesList || tradesList.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="12" class="text-center py-8 text-slate-500 font-medium italic">
+                        <td colspan="10" class="text-center py-8 text-slate-500 font-medium italic">
                             No active trades found for the selected month filter.
                         </td>
                     </tr>
@@ -1228,11 +1224,6 @@
 
             tradesList.forEach(trade => {
                 const isProfit = trade.returnVal >= 0;
-                const buyPriceFormatted = trade.buyPrice ? `\u20B9${trade.buyPrice.toLocaleString('en-IN', { minimumFractionDigits: 1 })}` : '-';
-                const buyQtyFormatted = trade.buyQty ? trade.buyQty.toLocaleString('en-IN') : '-';
-                const salePriceFormatted = trade.salePrice ? `\u20B9${trade.salePrice.toLocaleString('en-IN', { minimumFractionDigits: 1 })}` : '-';
-                const saleQtyFormatted = trade.saleQty ? trade.saleQty.toLocaleString('en-IN') : '-';
-
                 const rowHtml = `
                     <tr class="border-b border-slate-800/40 hover:bg-slate-900/35 transition-colors duration-150">
                         <td class="py-4 px-6 font-bold text-slate-200 whitespace-nowrap">${trade.date}</td>
@@ -1241,11 +1232,9 @@
                                 NIFTY-50
                             </span>
                         </td>
-                        <td class="py-4 px-6 font-semibold text-emerald-300/90">${buyPriceFormatted}</td>
-                        <td class="py-4 px-6 font-semibold text-slate-300">${buyQtyFormatted}</td>
+                        <td class="py-4 px-6 font-semibold text-slate-300">\u20B9${(trade.buyPrice || 0).toLocaleString('en-IN', { minimumFractionDigits: 1 })} | ${trade.buyQty || 0}</td>
                         <td class="py-4 px-6 font-semibold text-slate-300">\u20B9${trade.buy.toLocaleString('en-IN', { minimumFractionDigits: 1 })}</td>
-                        <td class="py-4 px-6 font-semibold text-amber-300/90">${salePriceFormatted}</td>
-                        <td class="py-4 px-6 font-semibold text-slate-300">${saleQtyFormatted}</td>
+                        <td class="py-4 px-6 font-semibold text-slate-300">\u20B9${(trade.salePrice || 0).toLocaleString('en-IN', { minimumFractionDigits: 1 })} | ${trade.saleQty || 0}</td>
                         <td class="py-4 px-6 font-semibold text-slate-300">\u20B9${trade.sell.toLocaleString('en-IN', { minimumFractionDigits: 1 })}</td>
                         <td class="py-4 px-6 font-semibold ${trade.pl >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
                             ${trade.pl >= 0 ? '+' : ''}\u20B9${trade.pl.toLocaleString('en-IN', { minimumFractionDigits: 1 })}
