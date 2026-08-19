@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js for beautiful trend analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- TradingView Technical Chart Library -->
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -285,30 +283,6 @@
                 </div>
             </div>
 
-            <!-- LIVE CANDLESTICK CHART (TRADINGVIEW) -->
-            <div class="glass-card p-5 rounded-3xl overflow-hidden shadow-2xl border border-slate-800/80">
-                <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800/60">
-                    <div class="flex items-center gap-2.5">
-                        <div class="p-2 bg-indigo-500/10 rounded-xl border border-indigo-500/20 text-indigo-400">
-                            <i class="fa-solid fa-chart-candlestick text-base"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
-                                Real-Time Candlestick Chart (NIFTY 50 / Stocks)
-                            </h3>
-                            <p class="text-[10px] text-slate-400">Interactive Technical Indicators & Multi-Timeframe Analysis</p>
-                        </div>
-                    </div>
-                    <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-extrabold uppercase tracking-wider flex items-center gap-1.5">
-                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span> TradingView Stream
-                    </span>
-                </div>
-                
-                <div class="tradingview-widget-container rounded-2xl overflow-hidden border border-slate-800/50" style="height: 520px; width: 100%;">
-                    <div id="tradingview_nifty" style="height: 100%; width: 100%;"></div>
-                </div>
-            </div>
-
             <!-- KPI Cards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
                 <div class="glass-card glowing-gold p-6 rounded-2xl relative overflow-hidden shadow-xl border-l-4 border-l-amber-500">
@@ -346,7 +320,7 @@
                     <p class="text-xs text-slate-400 mt-2">Sum of Nifty-50 closed trades</p>
                 </div>
 
-                <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden">
+                <div class="glass-card glowing-border p-6 rounded-2xl relative overflow-hidden shadow-lg">
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Value Per Member (1 Share)</p>
                     <div class="flex items-baseline gap-2">
                         <h2 id="perMemberValue" class="text-3xl font-extrabold text-white">&#8377;1,000.00</h2>
@@ -534,38 +508,16 @@
         let tradesChartInstance = null;
         let marketInterval = null;
         let manualMarketOverride = false;
-        let tradingViewWidget = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             checkExistingSession();
         });
-
-        function initTradingViewWidget(symbol = "NSE:NIFTY") {
-            if (typeof TradingView === 'undefined') return;
-            
-            document.getElementById('tradingview_nifty').innerHTML = "";
-            tradingViewWidget = new TradingView.widget({
-                "autosize": true,
-                "symbol": symbol,
-                "interval": "5",
-                "timezone": "Asia/Kolkata",
-                "theme": "dark",
-                "style": "1",
-                "locale": "in",
-                "toolbar_bg": "#090d16",
-                "enable_publishing": false,
-                "hide_side_toolbar": false,
-                "allow_symbol_change": true,
-                "container_id": "tradingview_nifty"
-            });
-        }
 
         function checkExistingSession() {
             const isAuth = localStorage.getItem('saikrupa_logged_in') === 'true';
             if (isAuth) {
                 document.getElementById('loginPortal').classList.add('hidden');
                 document.getElementById('dashboardApp').classList.remove('hidden');
-                initTradingViewWidget();
                 fetchDataFromSheet(defaultSheetUrl);
                 initMarketStatusTimer();
             } else {
@@ -584,7 +536,6 @@
                 document.getElementById('loginError').classList.add('hidden');
                 document.getElementById('loginPortal').classList.add('hidden');
                 document.getElementById('dashboardApp').classList.remove('hidden');
-                initTradingViewWidget();
                 fetchDataFromSheet(defaultSheetUrl);
                 initMarketStatusTimer();
                 showToast("Welcome to SaiKrupa TradeDesk!");
