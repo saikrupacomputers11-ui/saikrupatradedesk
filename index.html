@@ -174,6 +174,12 @@
                 </div>
                 
                 <div class="flex items-center gap-3 w-full sm:w-auto justify-end flex-wrap">
+                    <!-- Withdrawal Requests Admin Drawer Button -->
+                    <button onclick="toggleRequestsDrawer()" class="relative px-3.5 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-xl text-xs font-bold text-indigo-300 transition flex items-center gap-2 cursor-pointer shadow-md">
+                        <i class="fa-solid fa-bell text-indigo-400"></i> Withdrawal Requests
+                        <span id="withdrawalReqBadge" class="hidden bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full">0</span>
+                    </button>
+
                     <!-- Market Status Switch & Auto-Indicator -->
                     <div class="bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-1.5 flex items-center gap-2.5 text-xs">
                         <span id="marketLiveDot" class="h-2.5 w-2.5 rounded-full bg-rose-500 animate-pulse"></span>
@@ -472,6 +478,75 @@
         </main>
     </div>
 
+    <!-- CLIENT WITHDRAWAL REQUEST MODAL -->
+    <div id="withdrawalModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="max-w-md w-full glass-card p-6 rounded-3xl border border-slate-800 shadow-2xl relative">
+            <button onclick="closeWithdrawalModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center mb-5">
+                <div class="h-12 w-12 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-wallet text-xl"></i>
+                </div>
+                <h3 class="text-lg font-black text-white">Withdrawal Request</h3>
+                <p class="text-xs text-slate-400 mt-1">Submit request directly to Admin for fund transfer</p>
+            </div>
+            
+            <form id="withdrawalForm" onsubmit="submitWithdrawalRequest(event)" class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Partner Name</label>
+                    <input type="text" id="withdrawClientName" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-bold text-white focus:outline-none" readonly>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Available Fund Valuation</label>
+                    <input type="text" id="withdrawMaxVal" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-bold text-emerald-400 focus:outline-none" readonly>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Withdrawal Amount (₹)</label>
+                    <input type="number" id="withdrawAmt" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-emerald-500" placeholder="Enter amount to withdraw..." required>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">UPI ID / Phone Number</label>
+                    <input type="text" id="withdrawUpi" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. 9876543210@paytm / UPI ID" required>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Payment Method</label>
+                    <select id="withdrawMode" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer">
+                        <option value="Google Pay">Google Pay</option>
+                        <option value="PhonePe">PhonePe</option>
+                        <option value="Paytm">Paytm</option>
+                        <option value="UPI Direct">UPI Direct</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-3 rounded-xl transition text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-paper-plane"></i> Push Request to Admin
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADMIN WITHDRAWAL REQUESTS DRAWER MODAL -->
+    <div id="requestsDrawerModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="max-w-xl w-full glass-card p-6 rounded-3xl border border-slate-800 shadow-2xl relative">
+            <button onclick="toggleRequestsDrawer()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-5 border-b border-slate-800 pb-3">
+                <div class="h-10 w-10 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-2xl flex items-center justify-center">
+                    <i class="fa-solid fa-money-bill-transfer text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-white">Client Withdrawal Requests</h3>
+                    <p class="text-xs text-slate-400">Incoming requests for UPI payouts</p>
+                </div>
+            </div>
+
+            <div id="requestsListContainer" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+                <!-- Requests dynamic load -->
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification Box -->
     <div id="toast" class="fixed bottom-6 right-6 px-5 py-3 bg-slate-900 border border-emerald-500/30 text-emerald-300 rounded-2xl shadow-2xl z-50 hidden transition-all duration-300 flex items-center gap-2 text-xs font-bold">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -546,9 +621,11 @@
         let tradesChartInstance = null;
         let marketInterval = null;
         let manualMarketOverride = false;
+        let withdrawalRequests = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             checkExistingSession();
+            loadWithdrawalRequests();
         });
 
         function checkExistingSession() {
@@ -790,13 +867,11 @@
         // Dedicated helper function to fetch U11 (Row 11, Column U -> Index Row 10, Index Col 20)
         function extractLearningFromU11(rows) {
             try {
-                // Check exact cell U11 (Row 10, Col 20)
                 if (rows && rows.length > 10 && rows[10] && rows[10].length > 20) {
                     const u11Val = String(rows[10][20] || "").trim();
                     if (u11Val) return u11Val;
                 }
 
-                // Fallback scan across Row 11 (index 10) in case columns shifted
                 if (rows && rows.length > 10 && rows[10]) {
                     for (let c = 18; c <= 27; c++) {
                         const cellVal = String(rows[10][c] || "").trim();
@@ -1181,6 +1256,9 @@
                                 +\u20B9${profitPerMember.toLocaleString('en-IN', { maximumFractionDigits: 1 })}
                             </span>
                         </div>
+                        <button onclick="openWithdrawalModal('${escapeHtml(member.name)}', ${valuePerMember})" class="mt-3 w-full py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl text-[10px] font-bold text-amber-400 transition flex items-center justify-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-hand-holding-dollar"></i> Withdraw Request
+                        </button>
                     </div>
                 `;
                 membersGrid.insertAdjacentHTML('beforeend', cardHtml);
@@ -1242,11 +1320,10 @@
 
             selectEl.innerHTML = optionsHtml;
 
-            // DEFAULT SETTING: Select Current Month if available in trades, otherwise select the latest available month, else ALL
             if (monthMap[currentMonthKey]) {
                 selectEl.value = currentMonthKey;
             } else if (sortedKeys.length > 0) {
-                selectEl.value = sortedKeys[0]; // latest available month
+                selectEl.value = sortedKeys[0];
             } else {
                 selectEl.value = 'ALL';
             }
@@ -1269,7 +1346,6 @@
             const tableBody = document.getElementById('tradesTableBody');
             tableBody.innerHTML = "";
             
-            // Total PnL Calculation for the displayed filtered list
             const totalPnL = (tradesList || []).reduce((sum, t) => sum + (t.returnVal || 0), 0);
             const pnlDisplay = document.getElementById('monthlyTotalPnL');
             
@@ -1451,6 +1527,145 @@
 
             window.open(`https://api.whatsapp.com/send?text=${textMsg}`, '_blank');
             showToast("Learning Note WhatsApp share generated!");
+        }
+
+        /* WITHDRAWAL SYSTEM FUNCTIONS */
+        function openWithdrawalModal(clientName, maxValuation) {
+            document.getElementById('withdrawClientName').value = clientName;
+            document.getElementById('withdrawMaxVal').value = `₹${maxValuation.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+            document.getElementById('withdrawAmt').value = Math.floor(maxValuation);
+            document.getElementById('withdrawUpi').value = '';
+            document.getElementById('withdrawalModal').classList.remove('hidden');
+        }
+
+        function closeWithdrawalModal() {
+            document.getElementById('withdrawalModal').classList.add('hidden');
+        }
+
+        function submitWithdrawalRequest(e) {
+            e.preventDefault();
+            const clientName = document.getElementById('withdrawClientName').value;
+            const amount = document.getElementById('withdrawAmt').value;
+            const upiId = document.getElementById('withdrawUpi').value;
+            const mode = document.getElementById('withdrawMode').value;
+            const timeStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+            const newReq = {
+                id: Date.now(),
+                clientName,
+                amount,
+                upiId,
+                mode,
+                timeStr,
+                status: 'Pending'
+            };
+
+            withdrawalRequests.unshift(newReq);
+            saveWithdrawalRequests();
+            closeWithdrawalModal();
+            showToast(`Withdrawal request created for ${clientName}!`);
+
+            // Direct Push Alert to Specified Phone Number (919409688390) via WhatsApp
+            const waMsg = `💸 *NEW WITHDRAWAL REQUEST RECEIVED* 💸%0A%0A` +
+                          `• *Client Name:* ${encodeURIComponent(clientName)}%0A` +
+                          `• *Requested Amount:* ₹${encodeURIComponent(amount)}%0A` +
+                          `• *UPI ID / Phone:* ${encodeURIComponent(upiId)}%0A` +
+                          `• *Payment Mode:* ${encodeURIComponent(mode)}%0A` +
+                          `• *Request Time:* ${encodeURIComponent(timeStr)}%0A%0A` +
+                          `📌 *Admin Action:* Please process fund payout to given UPI ID.`;
+            
+            window.open(`https://api.whatsapp.com/send?phone=919409688390&text=${waMsg}`, '_blank');
+        }
+
+        function loadWithdrawalRequests() {
+            try {
+                const stored = localStorage.getItem('saikrupa_withdrawal_requests');
+                if (stored) {
+                    withdrawalRequests = JSON.parse(stored);
+                }
+            } catch(e) {
+                withdrawalRequests = [];
+            }
+            updateWithdrawalBadge();
+        }
+
+        function saveWithdrawalRequests() {
+            localStorage.setItem('saikrupa_withdrawal_requests', JSON.stringify(withdrawalRequests));
+            updateWithdrawalBadge();
+        }
+
+        function updateWithdrawalBadge() {
+            const badge = document.getElementById('withdrawalReqBadge');
+            const pendingCount = withdrawalRequests.filter(r => r.status === 'Pending').length;
+            if (pendingCount > 0) {
+                badge.innerText = pendingCount;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function toggleRequestsDrawer() {
+            const modal = document.getElementById('requestsDrawerModal');
+            if (modal.classList.contains('hidden')) {
+                renderRequestsList();
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function renderRequestsList() {
+            const container = document.getElementById('requestsListContainer');
+            container.innerHTML = '';
+
+            if (withdrawalRequests.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No withdrawal requests found.</p>`;
+                return;
+            }
+
+            withdrawalRequests.forEach(req => {
+                const isPending = req.status === 'Pending';
+                const card = `
+                    <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-black text-white">${escapeHtml(req.clientName)}</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${isPending ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}">${req.status}</span>
+                            </div>
+                            <p class="text-[11px] font-bold text-emerald-400 mt-1">₹${req.amount} <span class="text-[10px] text-slate-400">via ${escapeHtml(req.mode)}</span></p>
+                            <p class="text-[10px] font-mono text-slate-400">UPI: ${escapeHtml(req.upiId)}</p>
+                            <p class="text-[9px] text-slate-600">${req.timeStr}</p>
+                        </div>
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <button onclick="payViaUpi('${escapeHtml(req.upiId)}', '${req.amount}', '${escapeHtml(req.clientName)}')" class="flex-1 sm:flex-initial px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-[10px] font-extrabold uppercase transition shadow flex items-center justify-center gap-1 cursor-pointer">
+                                <i class="fa-solid fa-up-right-from-square"></i> Pay UPI
+                            </button>
+                            ${isPending ? `
+                                <button onclick="markReqStatus(${req.id}, 'Paid')" class="px-3 py-1.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 rounded-xl text-[10px] font-bold transition cursor-pointer">
+                                    Done
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', card);
+            });
+        }
+
+        function payViaUpi(upiId, amount, clientName) {
+            const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(clientName)}&am=${encodeURIComponent(amount)}&cu=INR`;
+            window.open(upiUrl, '_self');
+        }
+
+        function markReqStatus(reqId, status) {
+            const target = withdrawalRequests.find(r => r.id === reqId);
+            if (target) {
+                target.status = status;
+                saveWithdrawalRequests();
+                renderRequestsList();
+                showToast(`Request marked as ${status}`);
+            }
         }
     </script>
 </body>
