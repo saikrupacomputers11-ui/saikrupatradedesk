@@ -561,6 +561,9 @@
     <script>
         const defaultSheetUrl = "https://docs.google.com/spreadsheets/d/1OiAddKrNDZeIc1_A_Xd9tDygugaD-oaWByPAjT4ntcc/edit?gid=43965844#gid=43965844";
 
+        // Optional Apps Script Web App Endpoint URL to log row directly to AD:AK section dynamically in Google Sheet
+        const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbypJGcwMmgyIWt8yDN2kyWwYl2QS0zwcMoml6Nwv3Ow1GCM1QVjRdkCnReJ4JPsCAxNPQ/exec"; 
+
         const maleAvatarSvg = `
             <svg viewBox="0 0 100 100" class="relative h-12 w-12 rounded-full border-2 border-slate-700/80 shadow-md">
                 <circle cx="50" cy="50" r="48" fill="#e2ebf0" />
@@ -1542,12 +1545,27 @@
             document.getElementById('withdrawalModal').classList.add('hidden');
         }
 
+        async function saveWithdrawalToGoogleSheet(reqData) {
+            if (!GOOGLE_SHEET_WEB_APP_URL) return;
+            try {
+                await fetch(GOOGLE_SHEET_WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reqData)
+                });
+            } catch (err) {
+                console.error("Sheet sync failed: ", err);
+            }
+        }
+
         function submitWithdrawalRequest(e) {
             e.preventDefault();
             const clientName = document.getElementById('withdrawClientName').value;
             const amount = document.getElementById('withdrawAmt').value;
             const upiId = document.getElementById('withdrawUpi').value;
             const mode = document.getElementById('withdrawMode').value;
+            const maxValuation = document.getElementById('withdrawMaxVal').value;
             const timeStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
             const newReq = {
@@ -1557,11 +1575,16 @@
                 upiId,
                 mode,
                 timeStr,
-                status: 'Pending'
+                status: 'Pending',
+                maxValuation
             };
 
             withdrawalRequests.unshift(newReq);
             saveWithdrawalRequests();
+            
+            // Push Data to Google Sheet AD:AK Section via WebApp (Appends automatically to next empty row: AD3, AD4, AD5...)
+            saveWithdrawalToGoogleSheet(newReq);
+
             closeWithdrawalModal();
             showToast(`Withdrawal request created for ${clientName}!`);
 
